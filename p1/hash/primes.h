@@ -2,14 +2,10 @@
  * See primes.c++ for the gory details.
  */
 
-#include <stdint.h>
+#include <array>
+#include <cstdint>
 
-namespace primes {
-
-extern constexpr const size_t list[];
-extern constexpr const size_t count;
-
-} /* ~namespace primes */
+extern const std::array<size_t, 9999> primes;
 
 /*
 Copyright (C) 2022  Catherine Van West

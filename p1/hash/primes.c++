@@ -5,9 +5,7 @@
 
 #include "hash/primes.h"
 
-namespace primes {
-
-constexpr const size_t list[] = {
+const std::array<size_t, 9999> primes {
 	547, 1229, 1993, 2749, 3581, 4421,
 	5281, 6143, 7001, 7927, 8837, 9739,
 	10663, 11677, 12569, 13513, 14533, 15413,
@@ -1676,10 +1674,6 @@ constexpr const size_t list[] = {
 	15471059, 15472637, 15474317, 15475703, 15477467, 15479131,
 	15480713, 15482531, 15484279
 };
-
-static constexpr const size_t count = sizeof(list) / sizeof(size_t);
-
-} /* ~namespace primes */
 
 /*
 Copyright (C) 2022  Catherine Van West
