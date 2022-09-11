@@ -1,10 +1,15 @@
 /* Primes list for the hash table. See primes.c++ for the gory details. */
 
+#ifndef PRIMES_H
+#define PRIMES_H
+
 #include <array>
 #include <cstdint>
 
 size_t next_prime(size_t above);
 extern const std::array<size_t, 9999> primes;
+
+#endif
 
 /*
 Copyright (C) 2022  Catherine Van West
