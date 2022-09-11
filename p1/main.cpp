@@ -6,17 +6,29 @@
 #include <iostream>
 #include <string>
 
+using system_clock = std::chrono::system_clock;
+using seconds_type = std::chrono::seconds;
+
 int main() {
 	std::string dict_file;
 	std::cout << "Enter name of dictionary: ";
 	std::getline(std::cin, dict_file);
 
+	system_clock::time_point start = system_clock::now();
+
 	std::ifstream dict_in(dict_file);
 	std::string dict;
+
+	system_clock::time_point end = system_clock::now();
+
+	seconds_type dict_loading_time =
+		std::chrono::duration_cast<seconds_type>(end - start);
+	std::cout << dict_loading_time.count();
 
 	// get until EOF, so long as we don't see any null characters
 	std::getline(dict_in, dict, '\0');
 
+	std::cout << dict;
 /*
 	std::string input_file;
 	std::cout << "Enter name of input file: ";
