@@ -8,8 +8,6 @@
 
 class word {
 public:
-	word() = default;
-
 	/* Read a word from a stream. Will stop reading when a word separator is
 	   encountered or EOF is reached. */
 	std::istream& operator>>(std::istream&);
