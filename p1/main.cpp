@@ -3,13 +3,17 @@
 //#include "spell/checker.h"
 #include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
 using system_clock = std::chrono::system_clock;
-using seconds_type = std::chrono::seconds;
+using time_type = std::chrono::duration<float>;
 
 int main() {
+	// set cout to fixed precision, 3 decimal places
+	std::cout << std::fixed << std::setprecision(3);
+
 	std::string dict_file;
 	std::cout << "Enter name of dictionary: ";
 	std::getline(std::cin, dict_file);
@@ -21,8 +25,8 @@ int main() {
 
 	system_clock::time_point end = system_clock::now();
 
-	seconds_type dict_loading_time =
-		std::chrono::duration_cast<seconds_type>(end - start);
+	time_type dict_loading_time =
+		std::chrono::duration_cast<time_type>(end - start);
 	std::cout << dict_loading_time.count();
 
 	// get until EOF, so long as we don't see any null characters
