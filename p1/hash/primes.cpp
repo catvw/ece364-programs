@@ -1,9 +1,15 @@
-/*
- * I wouldn't have wanted to calculate these either, so I stole them from
- * here: https://primes.utm.edu/lists/small/millions/
- */
+/* I wouldn't have wanted to calculate these either, so I stole them from here:
+   https://primes.utm.edu/lists/small/millions/ */
 
 #include "hash/primes.h"
+
+#include <algorithm>
+
+size_t next_prime(size_t above) {
+	/* since these are in sorted order, we can just binary-search the primes
+	   array, which is what lower_bound() does internally */
+	return *std::lower_bound(primes.begin(), primes.end(), above + 1);
+}
 
 const std::array<size_t, 9999> primes {
 	547, 1229, 1993, 2749, 3581, 4421,
