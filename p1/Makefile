@@ -1,20 +1,6 @@
-spell.exe: spellcheck.o hash.o
-	g++ -o spell.exe spellcheck.o hash.o
+spellcheck: main.cpp
+	g++ -g -o spellcheck main.cpp
 
-spellcheck.o: spellcheck.cpp hash.h
-	g++ -c spellcheck.cpp
-
-hash.o: hash.cpp hash.h
-	g++ -c hash.cpp
-
-debug:
-	g++ -g -o spellDebug.exe spellcheck.cpp hash.cpp
-
+.PHONY: clean
 clean:
-	rm -f *.exe *.o *.stackdump *~
-
-backup:
-	test -d backups || mkdir backups
-	cp *.cpp backups
-	cp *.h backups
-	cp Makefile backups
+	rm -f spellcheck
