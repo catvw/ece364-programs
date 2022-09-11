@@ -14,7 +14,7 @@ checker::checker(const std::string& wordlist) {
 }
 
 std::string checker::check(const std::string& document) {
-	std::istringstream is_doc(document);
+	std::istringstream doc_in(document);
 	std::ostringstream objections;
 
 	bool more_lines = true;
@@ -23,13 +23,13 @@ std::string checker::check(const std::string& document) {
 	// go through the input line-by-line and check each one
 	std::string line;
 	while (more_lines) {
-		more_lines = !std::getline(is_doc, line).fail();
+		more_lines = !std::getline(doc_in, line).fail();
 
-		std::istringstream is_line(line);
+		std::istringstream line_in(line);
 		word w;
 		bool more_words = true;
 		while (more_words) {
-			more_words = !(is_line >> w).fail();
+			more_words = !(line_in >> w).fail();
 			object_to(w, line, objections);
 		}
 	}
