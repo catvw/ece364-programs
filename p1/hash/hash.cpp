@@ -28,10 +28,6 @@ enum {
 };
 } /* ~return_code */
 
-// Calculate the hash of a string-based key. There's no reason to have every
-// table have its own.
-
-
 /* Seek out a prospective position in the table. The value returned by this
    function is either the index in the table where the given key was found *or*
    the empty cell to put the key in.
