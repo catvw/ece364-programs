@@ -8,11 +8,20 @@ spellcheck: main.cpp $(wildcard $(SPELL_DEPS)) | $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@
 
+.PHONY: test
+test: spellcheck
+	./test.sh
+
+.PHONY: debug
+debug: spellcheck
+	mkdir -p tmp/
+	lldb spellcheck
+
 SUBDIRS_CLEAN=$(addprefix -clean-,$(SUBDIRS))
 
 .PHONY: clean
 clean: $(SUBDIRS_CLEAN)
-	rm -f spellcheck
+	rm -rf spellcheck tmp/
 
 .PHONY: $(SUBDIRS_CLEAN)
 $(SUBDIRS_CLEAN):
