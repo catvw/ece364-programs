@@ -8,19 +8,21 @@
 
 class word {
 public:
-	/* Read a word from a stream. Will stop reading when a word separator is
-	   encountered or EOF is reached. */
-	std::istream& operator>>(std::istream&);
-
 	/* Return whether the given character is a valid character for a word. */
 	static bool is_valid_char(char);
 
 	/* Return the string representation of the word. */
-	inline const std::string& str() { return word; }
+	inline const std::string& str() const { return word; }
+
+	friend std::istream& operator>>(std::istream&, word&);
 
 private:
 	std::string word;
 };
+
+/* Read a word from a stream. Will stop reading when a word separator is
+   encountered or EOF is reached. */
+std::istream& operator>>(std::istream&, word&);
 
 #endif
 

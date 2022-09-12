@@ -7,7 +7,7 @@
 #include "dictionary.h"
 #include "word.h"
 
-#include <cstdint>
+#include <cstddef>
 #include <string>
 #include <ostream>
 

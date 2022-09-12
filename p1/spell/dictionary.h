@@ -3,7 +3,7 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
-#include "../hash/hashTable.h"
+#include "../hash/hash.h"
 #include "word.h"
 
 class dictionary {

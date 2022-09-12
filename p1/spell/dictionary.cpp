@@ -1,4 +1,4 @@
-#include "spell/dictionary.h"
+#include "dictionary.h"
 
 void dictionary::add_word(const word& w) {
 	// you never said what we should do if the rehash fails, so...

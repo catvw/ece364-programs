@@ -25,7 +25,7 @@ enum {
 
 	// for findPos()
 	not_in_table = -1, // unsurprisingly
-}
+};
 } /* ~return_code */
 
 // Calculate the hash of a string-based key. There's no reason to have every
@@ -37,14 +37,15 @@ enum {
    the empty cell to put the key in.
 
    Note: there better be a position that this can find! */
-int seek(const std::vector<hashItem>& data, const std::string& key) {
+template<typename Cell>
+int seek(const std::vector<Cell>& data, const std::string& key) {
 	auto location = string_hash(key);
 	int index;
 	bool should_stop;
 
 	do {
 		index = location++ % data.size();
-		const hashItem& cell = data[index];
+		const Cell& cell = data[index];
 
 		/* we should stop if we either find an empty (non-deleted) cell or find
 		   a matching key */
@@ -55,21 +56,23 @@ int seek(const std::vector<hashItem>& data, const std::string& key) {
 }
 
 /* Set up the given cell to contain an item. */
-void set(hashItem& cell, const std::string& key, const void* pv) {
+template<typename Cell>
+void set(Cell& cell, const std::string& key, void* pv) {
 	cell.key = key;
 	cell.pv = pv;
 	cell.isOccupied = true;
 }
 
 /* Lazily delete the given cell. */
-void del(hashItem& cell) {
+template<typename Cell>
+void del(Cell& cell) {
 	cell.isDeleted = true;
 }
 
 hashTable::hashTable(int size)
 : filled{0},
-  capacity{hashTable::getPrime(size)},
-  data{capacity} {}
+  capacity{static_cast<int>(hashTable::getPrime(size))},
+  data(capacity) {}
 
 int hashTable::insert(const std::string& key, void* pv) {
 	// ensure that we have the space
@@ -151,7 +154,7 @@ bool hashTable::rehash() {
 	}
 }
 
-static unsigned int hashTable::getPrime(int size) {
+unsigned int hashTable::getPrime(int size) {
 	return next_prime(size); // why is this a function in the table itself?
 }
 

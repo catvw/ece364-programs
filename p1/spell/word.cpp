@@ -3,7 +3,7 @@
 #include <cctype>
 #include <sstream>
 
-std::istream& word::operator>>(std::istream& is) {
+std::istream& operator>>(std::istream& is, word& w) {
 	char c;
 	std::ostringstream in_progress;
 
@@ -12,10 +12,11 @@ std::istream& word::operator>>(std::istream& is) {
 		else break;
 	}
 
-	this->word = in_progress.str();
+	w.word = in_progress.str();
+	return is;
 }
 
-static bool word::is_valid_char(char c) {
+bool word::is_valid_char(char c) {
 	const char lower = tolower(c);
 	return (lower >= 'a' && lower <= 'z') // letter
 		   || (c >= '0' && c <= '9') // digit

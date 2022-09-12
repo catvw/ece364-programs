@@ -4,7 +4,7 @@
 #define PRIMES_H
 
 #include <array>
-#include <cstdint>
+#include <cstddef>
 
 size_t next_prime(size_t above);
 extern const std::array<size_t, 9999> primes;
