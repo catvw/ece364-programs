@@ -1,7 +1,8 @@
 SUBDIRS=hash spell
+SPELL_DEPS=$(addsuffix /*.o,$(SUBDIRS))
 
 spellcheck: $(SUBDIRS) main.cpp
-	g++ -g -o spellcheck hash/hash.o spell/checker.o main.cpp
+	g++ -g -o spellcheck $(SPELL_DEPS) main.cpp
 
 .PHONY: $(SUBDIRS)
 $(SUBDIRS):
