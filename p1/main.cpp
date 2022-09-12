@@ -1,6 +1,8 @@
 /* Driver program for the spellchecker. */
 
 #include "spell/checker.h"
+#include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -10,9 +12,9 @@
 using system_clock = std::chrono::system_clock;
 using time_type = std::chrono::duration<float>;
 
-std::string prompt_for_dict() {
+std::string prompt(const char* pr) {
 	std::string dict_file;
-	std::cout << "Enter name of dictionary: ";
+	std::cout << pr;
 	std::getline(std::cin, dict_file);
 	return dict_file;
 }
@@ -21,7 +23,7 @@ int main() {
 	// set cout to fixed precision, 3 decimal places
 	std::cout << std::fixed << std::setprecision(3);
 
-	std::ifstream dict_file(prompt_for_dict());
+	std::ifstream dict_file(prompt("Enter name of dictionary: "));
 	std::string dict;
 
 	// load the dictionary
@@ -40,15 +42,16 @@ int main() {
 	std::cout << "Total time (in seconds) to load dictionary: "
 	          << dict_loading_time.count() << '\n';
 
-/*
-	std::string input_file;
-	std::cout << "Enter name of input file: ";
-	std::getline(std::cin, input_file);
+	std::ifstream in_file(prompt("Enter name of input file: "));
+	std::ofstream out_file(prompt("Enter name of output file: "));
 
-	std::string output_file;
-	std::cout << "Enter name of output file: ";
-	std::getline(std::cin, output_file);
-*/
+	// read the input file and convert to minuscule
+	std::string in;
+	std::getline(in_file, in, '\0');
+	std::transform(in.begin(), in.end(), in.begin(), tolower);
+
+	std::string out = ch.check(in);
+	out_file << out;
 }
 
 /*
