@@ -76,8 +76,8 @@ hashTable::hashTable(int size)
 
 int hashTable::insert(const std::string& key, void* pv) {
 	// ensure that we have the space
-	if (static_cast<float>(filled)/capacity > load_factor && !rehash()) {
-		return code::rehash_failed;
+	if (static_cast<float>(filled)/capacity > load_factor) {
+		if (!rehash()) return code::rehash_failed;
 	}
 
 	// find the prospective location
@@ -89,6 +89,7 @@ int hashTable::insert(const std::string& key, void* pv) {
 	}
 
 	set(cell, key, pv);
+	++filled;
 	return code::success;
 }
 
@@ -147,6 +148,7 @@ bool hashTable::rehash() {
 		}
 
 		// get the data out of the old table
+		capacity = new_table.capacity;
 		data = std::move(new_table.data);
 		return true;
 	} catch (std::bad_alloc&) { // I was wrong!
