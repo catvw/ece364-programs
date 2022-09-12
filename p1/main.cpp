@@ -10,29 +10,36 @@
 using system_clock = std::chrono::system_clock;
 using time_type = std::chrono::duration<float>;
 
+std::string prompt_for_dict() {
+	std::string dict_file;
+	std::cout << "Enter name of dictionary: ";
+	std::getline(std::cin, dict_file);
+	return dict_file;
+}
+
 int main() {
 	// set cout to fixed precision, 3 decimal places
 	std::cout << std::fixed << std::setprecision(3);
 
-	std::string dict_file;
-	std::cout << "Enter name of dictionary: ";
-	std::getline(std::cin, dict_file);
+	std::ifstream dict_file(prompt_for_dict());
+	std::string dict;
 
+	// load the dictionary
 	system_clock::time_point start = system_clock::now();
 
-	std::ifstream dict_in(dict_file);
-	std::string dict;
+	// get until EOF, so long as we don't see any null characters
+	std::getline(dict_file, dict, '\0');
+
+	// create a spell checker for the dictionary
+	checker ch(dict);
 
 	system_clock::time_point end = system_clock::now();
 
 	time_type dict_loading_time =
 		std::chrono::duration_cast<time_type>(end - start);
-	std::cout << dict_loading_time.count();
+	std::cout << "Total time (in seconds) to load dictionary: "
+	          << dict_loading_time.count() << '\n';
 
-	// get until EOF, so long as we don't see any null characters
-	std::getline(dict_in, dict, '\0');
-
-	std::cout << dict;
 /*
 	std::string input_file;
 	std::cout << "Enter name of input file: ";
