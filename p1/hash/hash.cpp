@@ -142,7 +142,7 @@ int hashTable::findPos(const std::string& key) {
 }
 
 bool hashTable::rehash() {
-	int next_prime = getPrime(capacity);
+	int next_prime = getPrime(capacity*2);
 
 	try { // I'm going to assume that memory is cheaper than time
 		// create a new (temporary) hash table with the new size
