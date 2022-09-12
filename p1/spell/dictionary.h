@@ -8,6 +8,9 @@
 
 class dictionary {
 public:
+	/* Create a new dictionary. */
+	dictionary();
+
 	/* Add a word to the dictionary. */
 	void add_word(const word&);
 

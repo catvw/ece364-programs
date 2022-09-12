@@ -28,6 +28,13 @@ enum {
 };
 } /* ~return_code */
 
+/* Calculate an alternate hash for use when resolving collisions. Done
+   according to the suggested double-hash in the textbook. */
+int double_hash(int index, int size) {
+	const int mod = size/2;
+	return mod - (index % mod);
+}
+
 /* Seek out a prospective position in the table. The value returned by this
    function is either the index in the table where the given key was found *or*
    the empty cell to put the key in.
@@ -35,18 +42,22 @@ enum {
    Note: there better be a position that this can find! */
 template<typename Cell>
 int seek(const std::vector<Cell>& data, const std::string& key) {
-	auto location = string_hash(key);
-	int index;
-	bool should_stop;
+	const auto size = data.size();
+	int index = string_hash(key) % size;
+	int jump_size = double_hash(index, size);
 
-	do {
-		index = location++ % data.size();
+	for (;;) {
 		const Cell& cell = data[index];
 
 		/* we should stop if we either find an empty (non-deleted) cell or find
 		   a matching key */
-		should_stop = !cell.isOccupied || (!cell.isDeleted && cell.key == key);
-	} while (!should_stop);
+		bool should_stop = !cell.isOccupied
+		                   || (!cell.isDeleted && cell.key == key);
+		if (should_stop) break;
+
+		// continue on to the next prospective index
+		index = (index + jump_size) % size;
+	}
 
 	return index;
 }
