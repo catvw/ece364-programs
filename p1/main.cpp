@@ -38,21 +38,27 @@ int main() {
 
 	system_clock::time_point end = system_clock::now();
 
-	time_type dict_loading_time =
-		std::chrono::duration_cast<time_type>(end - start);
+	time_type elapsed = std::chrono::duration_cast<time_type>(end - start);
 	std::cout << "Total time (in seconds) to load dictionary: "
-	          << dict_loading_time.count() << '\n';
+	          << elapsed.count() << '\n';
 
 	std::ifstream in_file(prompt("Enter name of input file: "));
 	std::ofstream out_file(prompt("Enter name of output file: "));
 
 	// read the input file and convert to minuscule
+	start = system_clock::now();
+
 	std::string in;
 	std::getline(in_file, in, '\0');
 	std::transform(in.begin(), in.end(), in.begin(), tolower);
 
 	std::string out = ch.check(in);
 	out_file << out;
+
+	end = system_clock::now();
+	elapsed = std::chrono::duration_cast<time_type>(end - start);
+	std::cout << "Total time (in seconds) to check document: "
+	          << elapsed.count() << '\n';
 }
 
 /*
