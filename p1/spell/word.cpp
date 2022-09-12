@@ -1,4 +1,4 @@
-#include "spell/word.h"
+#include "word.h"
 
 #include <cctype>
 #include <sstream>

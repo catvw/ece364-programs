@@ -4,8 +4,8 @@
 #ifndef CHECKER_H
 #define CHECKER_H
 
-#include "spell/dictionary.h"
-#include "spell/word.h"
+#include "dictionary.h"
+#include "word.h"
 
 #include <cstdint>
 #include <string>

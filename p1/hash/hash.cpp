@@ -3,9 +3,9 @@
    interface is set up, and think it could use more helper functions... but so
    be it. Backend magic for now. */
 
-#include "hash/hash.h"
+#include "hash.h"
 
-#include "hash/primes.h"
+#include "primes.h"
 #include <functional>
 #include <utility>
 

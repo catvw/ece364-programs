@@ -3,8 +3,8 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
-#include "hash/hashTable.h"
-#include "spell/word.h"
+#include "../hash/hashTable.h"
+#include "word.h"
 
 class dictionary {
 public:

@@ -1,4 +1,4 @@
-#include "spell/checker.h"
+#include "checker.h"
 
 #include <sstream>
 

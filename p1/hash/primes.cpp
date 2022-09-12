@@ -1,7 +1,7 @@
 /* I wouldn't have wanted to calculate these either, so I stole them from here:
    https://primes.utm.edu/lists/small/millions/ */
 
-#include "hash/primes.h"
+#include "primes.h"
 
 #include <algorithm>
 

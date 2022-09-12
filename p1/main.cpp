@@ -1,6 +1,6 @@
 /* Driver program for the spellchecker. */
 
-//#include "spell/checker.h"
+#include "spell/checker.h"
 #include <chrono>
 #include <fstream>
 #include <iomanip>
