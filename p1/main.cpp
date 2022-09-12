@@ -34,6 +34,7 @@ int main() {
 
 	// create a spell checker for the dictionary
 	checker ch(dict);
+	ch.set_max_word_length(20);
 
 	system_clock::time_point end = system_clock::now();
 

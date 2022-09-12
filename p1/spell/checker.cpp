@@ -2,7 +2,8 @@
 
 #include <sstream>
 
-checker::checker(const std::string& wordlist) {
+checker::checker(const std::string& wordlist)
+: max_word_length{-1} {
 	std::istringstream is(wordlist);
 	word w;
 	bool more_words = true;
@@ -32,15 +33,21 @@ std::string checker::check(const std::string& document) {
 			more_words = !(line_in >> w).fail();
 			object_to(w, line_number, objections);
 		}
+
+		++line_number;
 	}
 
 	return objections.str();
 }
 
+void checker::set_max_word_length(ssize_t length) {
+	max_word_length = length;
+}
+
 void checker::object_to(const word& w, size_t line, std::ostream& obj) {
-	if (w.str().length() > max_word_length) {
+	if (max_word_length >= 0 && w.str().length() > max_word_length) {
 		obj << "Long word at line " << line
-		    << ", starts " << w.str().substr(0, max_word_length)
+		    << ", starts: " << w.str().substr(0, max_word_length)
 		    << '\n';
 	} else if (!dict.contains(w)) {
 		obj << "Unknown word at line " << line
