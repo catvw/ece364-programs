@@ -19,46 +19,46 @@ std::string prompt(const char* pr) {
 	return dict_file;
 }
 
+std::string read_file(std::istream& file, std::string& out) {
+	// get until EOF, so long as we don't see any null characters
+	std::getline(file, out, '\0');
+	std::transform(out.begin(), out.end(), out.begin(), tolower);
+	return out;
+}
+
+template<typename Task>
+void time_and_report(Task t, const std::string& message) {
+	system_clock::time_point start = system_clock::now();
+	t();
+	system_clock::time_point end = system_clock::now();
+
+	time_type elapsed = std::chrono::duration_cast<time_type>(end - start);
+	std::cout << message << elapsed.count() << '\n';
+}
+
 int main() {
 	// set cout to fixed precision, 3 decimal places
 	std::cout << std::fixed << std::setprecision(3);
 
 	std::ifstream dict_file(prompt("Enter name of dictionary: "));
-	std::string dict;
-
-	// load the dictionary
-	system_clock::time_point start = system_clock::now();
-
-	// get until EOF, so long as we don't see any null characters
-	std::getline(dict_file, dict, '\0');
-
-	// create a spell checker for the dictionary
-	checker ch(dict);
+	checker ch;
 	ch.set_max_word_length(20);
 
-	system_clock::time_point end = system_clock::now();
-
-	time_type elapsed = std::chrono::duration_cast<time_type>(end - start);
-	std::cout << "Total time (in seconds) to load dictionary: "
-	          << elapsed.count() << '\n';
+	// load the dictionary
+	time_and_report([&]() {
+		std::string dict;
+		read_file(dict_file, dict);
+		ch.add_words(dict);
+	}, "Total time (in seconds) to load dictionary: ");
 
 	std::ifstream in_file(prompt("Enter name of input file: "));
 	std::ofstream out_file(prompt("Enter name of output file: "));
 
-	// read the input file and convert to minuscule
-	start = system_clock::now();
-
-	std::string in;
-	std::getline(in_file, in, '\0');
-	std::transform(in.begin(), in.end(), in.begin(), tolower);
-
-	std::string out = ch.check(in);
-	out_file << out;
-
-	end = system_clock::now();
-	elapsed = std::chrono::duration_cast<time_type>(end - start);
-	std::cout << "Total time (in seconds) to check document: "
-	          << elapsed.count() << '\n';
+	time_and_report([&]() {
+		std::string in;
+		read_file(in_file, in);
+		out_file << ch.check(in);
+	}, "Total time (in seconds) to check document: ");
 }
 
 /*

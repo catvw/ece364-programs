@@ -2,8 +2,15 @@
 
 #include <sstream>
 
+checker::checker()
+: max_word_length{-1} {}
+
 checker::checker(const std::string& wordlist)
 : max_word_length{-1} {
+	add_words(wordlist);
+}
+
+void checker::add_words(const std::string& wordlist) {
 	std::istringstream is(wordlist);
 	word w;
 	bool more_words = true;

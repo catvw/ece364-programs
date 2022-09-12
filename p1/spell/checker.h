@@ -13,9 +13,15 @@
 
 class checker {
 public:
+	/* Construct an empty spellchecker. */
+	checker();
+
 	/* Construct a spellchecker with the given wordlist. Every "word" in the
 	   wordlist will be read into the checker's internal dictionary. */
 	checker(const std::string&);
+
+	/* Add the given wordlist to the checker's dictionary. */
+	void add_words(const std::string&);
 
 	/* Check the given document against the dictionary, and report all the
 	   violations. */
