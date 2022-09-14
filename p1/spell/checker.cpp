@@ -52,6 +52,8 @@ void checker::set_max_word_length(ssize_t length) {
 }
 
 void checker::object_to(const word& w, size_t line, std::ostream& obj) {
+	if (w.contains_digit()) return; // it's weird, don't bother
+
 	if (max_word_length >= 0 && w.str().length() > max_word_length) {
 		obj << "Long word at line " << line
 		    << ", starts: " << w.str().substr(0, max_word_length)
