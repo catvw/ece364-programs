@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # archive program 1
-tar acvf p1.tar.gz p1/Makefile p1/.subdeps p1/test.sh p1/main.cpp p1/hash/ p1/spell/ p1/ref/
+tar acvf p1.tar.gz p1/Makefile p1/test.sh p1/main.cpp p1/hash/ p1/spell/ p1/ref/
 
 #Copyright (C) 2022  Catherine Van West
 #

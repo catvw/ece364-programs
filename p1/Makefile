@@ -1,28 +1,32 @@
-SUBDIRS=hash spell
-SPELL_DEPS=$(addsuffix /*.o,$(SUBDIRS))
-.SUFFIXES:
+MAKE_PREFIX=-make.
+CLEAN_PREFIX=-clean.
 
-.NOTPARALLEL: spellcheck
-spellcheck: main.cpp .subdeps $(wildcard $(SPELL_DEPS))
+SUBDIRS=hash spell
+SUBDIRS_MAKE=$(addprefix $(MAKE_PREFIX), $(SUBDIRS))
+SUBDIRS_CLEAN=$(addprefix $(CLEAN_PREFIX),$(SUBDIRS))
+
+SPELL_DEPS=$(addsuffix /*.o,$(SUBDIRS))
+
+.DEFAULT .PHONY .NOTPARALLEL: spellcheck_all
+spellcheck_all: -subdirs spellcheck
+
+-subdirs: $(SUBDIRS_MAKE)
+
+.PHONY: $(SUBDIRS_MAKE)
+$(SUBDIRS_MAKE):
+	$(MAKE) -C $(subst $(MAKE_PREFIX),,$@)
+
+spellcheck: main.cpp $(wildcard $(SPELL_DEPS))
 	g++ -g -o spellcheck $(SPELL_DEPS) main.cpp
 
-# simply because make needs to do this first
-.subdeps: | $(SUBDIRS)
-
-.PHONY: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@
-
 .PHONY: test
-test: spellcheck
+test: spellcheck_all
 	./test.sh
 
 .PHONY: debug
-debug: spellcheck
+debug: spellcheck_all
 	mkdir -p tmp/
 	lldb spellcheck
-
-SUBDIRS_CLEAN=$(addprefix -clean-,$(SUBDIRS))
 
 .PHONY: clean
 clean: $(SUBDIRS_CLEAN)
@@ -30,4 +34,4 @@ clean: $(SUBDIRS_CLEAN)
 
 .PHONY: $(SUBDIRS_CLEAN)
 $(SUBDIRS_CLEAN):
-	$(MAKE) -C $(subst -clean-,,$@) clean
+	$(MAKE) -C $(subst $(CLEAN_PREFIX),,$@) clean
