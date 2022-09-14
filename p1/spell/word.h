@@ -8,16 +8,23 @@
 
 class word {
 public:
+	/* Create a new word. */
+	inline word() : word_str{}, there_is_a_digit{false} {}
+
 	/* Return whether the given character is a valid character for a word. */
 	static bool is_valid_char(char);
 
 	/* Return the string representation of the word. */
-	inline const std::string& str() const { return word; }
+	inline const std::string& str() const { return word_str; }
+
+	/* Check if the word contains a digit. */
+	inline const bool contains_digit() const { return there_is_a_digit; }
 
 	friend std::istream& operator>>(std::istream&, word&);
 
 private:
-	std::string word;
+	std::string word_str;
+	bool there_is_a_digit;
 };
 
 /* Read a word from a stream. Will stop reading when a word separator is

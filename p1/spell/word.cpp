@@ -6,20 +6,23 @@
 std::istream& operator>>(std::istream& is, word& w) {
 	char c;
 	std::ostringstream in_progress;
+	w.there_is_a_digit = false;
 
 	while (is.get(c)) {
-		if (word::is_valid_char(c)) in_progress << c;
+		if (word::is_valid_char(c)) {
+			in_progress << c;
+			if (isdigit(c)) w.there_is_a_digit = true;
+		}
 		else break;
 	}
 
-	w.word = in_progress.str();
+	w.word_str = in_progress.str();
 	return is;
 }
 
 bool word::is_valid_char(char c) {
-	const char lower = tolower(c);
-	return (lower >= 'a' && lower <= 'z') // letter
-		   || (c >= '0' && c <= '9') // digit
+	return isalnum(c) // letter
+		   || isdigit(c) // digit
 		   || c == '-' || c == '\''; // other
 }
 
