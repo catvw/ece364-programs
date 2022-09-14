@@ -3,13 +3,18 @@
 #ifndef WORD_H
 #define WORD_H
 
-#include <string>
+#include <exception>
 #include <istream>
+#include <string>
+
+/* Thrown on construction if an invalid character is passed. */
+class invalid_char : public std::exception {};
 
 class word {
 public:
 	/* Create a new word. */
 	inline word() : word_str{}, there_is_a_digit{false} {}
+	word(const std::string&);
 
 	/* Return whether the given character is a valid character for a word. */
 	static bool is_valid_char(char);

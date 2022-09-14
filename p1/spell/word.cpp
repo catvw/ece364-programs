@@ -3,6 +3,13 @@
 #include <cctype>
 #include <sstream>
 
+word::word(const std::string& str) {
+	for (char c : str) {
+		if (!word::is_valid_char(c)) throw invalid_char{};
+	}
+	word_str = str;
+}
+
 std::istream& operator>>(std::istream& is, word& w) {
 	char c;
 	std::ostringstream in_progress;

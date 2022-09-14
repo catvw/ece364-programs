@@ -11,13 +11,17 @@ checker::checker(const std::string& wordlist)
 }
 
 void checker::add_words(const std::string& wordlist) {
-	std::istringstream is(wordlist);
-	word w;
-	bool more_words = true;
+	std::istringstream list_in(wordlist);
+	std::string line;
+	bool more_lines = true;
 
-	while (more_words) {
-		more_words = !(is >> w).fail();
-		dict.add_word(w);
+	while (more_lines) {
+		more_lines = !std::getline(list_in, line).fail();
+		
+		// only add words that meet spec
+		try {
+			dict.add_word(word{line});
+		} catch (invalid_char&) {}
 	}
 }
 
