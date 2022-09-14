@@ -1,8 +1,13 @@
 SUBDIRS=hash spell
 SPELL_DEPS=$(addsuffix /*.o,$(SUBDIRS))
+.SUFFIXES:
 
-spellcheck: main.cpp $(wildcard $(SPELL_DEPS)) | $(SUBDIRS)
+.NOTPARALLEL: spellcheck
+spellcheck: main.cpp .subdeps $(wildcard $(SPELL_DEPS))
 	g++ -g -o spellcheck $(SPELL_DEPS) main.cpp
+
+# simply because make needs to do this first
+.subdeps: | $(SUBDIRS)
 
 .PHONY: $(SUBDIRS)
 $(SUBDIRS):
