@@ -25,19 +25,57 @@ static inline void assert(size_t line, bool thing, const char* message) {
 int main() {
 	size_t capacity = 3;
 	heap test_heap(capacity);
+	char addresses[32];
 
 	// ensure that we can insert three things
 	ASSERT(
-		test_heap.insert("first", 19, nullptr) == heap::success,
+		test_heap.insert("first", 19, addresses) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
-		test_heap.insert("second", 66, nullptr) == heap::success,
+		test_heap.insert("second", 66, addresses + 1) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
-		test_heap.insert("third", -12, nullptr) == heap::success,
+		test_heap.insert("third", -12, addresses + 2) == heap::success,
 		"could not insert into heap"
+	);
+
+	// ensure that we cannot insert another
+	ASSERT(
+		test_heap.insert("fourth", -71, addresses  + 3) == heap::heap_full,
+		"could still insert into heap!"
+	);
+
+	// see if we can perform a deleteMin and get everything back
+	std::string id;
+	int key = 0;
+	char* data = addresses - 1;
+	ASSERT(
+		test_heap.deleteMin(&id, &key, &data) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "third", "wrong id returned");
+	ASSERT(key == -12, "wrong key returned");
+	ASSERT(data == addresses + 2, "wrong data returned");
+
+	// see about removing something specific
+	ASSERT(
+		test_heap.remove("first", &key, &data) == heap::success,
+		"remove() did not report success"
+	);
+	ASSERT(key == 19, "wrong key returned");
+	ASSERT(data == addresses, "wrong data returned");
+
+	// ensure we empty out the heap
+	ASSERT(
+		test_heap.deleteMin(&id, &key, &data) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "second", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin() == heap::heap_empty,
+		"deleteMin() should have reported empty"
 	);
 
 	return 0;
