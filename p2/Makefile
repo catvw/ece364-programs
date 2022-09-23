@@ -1,23 +1,25 @@
-# copied shamelessly from http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
+# copied in part from http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 
-SRCS=$(wildcard *.c *.cpp *.c++)
+.SUFFIXES:
 
-DEPDIR = .deps
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+SOURCES := $(wildcard *.cpp */*.cpp)
+OBJECTS := $(SOURCES:%.cpp=%.o)
+DEPENDS := $(SOURCES:%.cpp=%.d)
+DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 
-CC = g++
-CPPFLAGS = -std=c++11
-COMPILE = $(CC) $(DEPFLAGS) $(CPPFLAGS)
+useHeap: $(OBJECTS)
+	g++ -o $@ $(OBJECTS)
 
-%.o: %.c $(DEPDIR)/%.d | $(DEPDIR)
+%.o: %.cpp %.d
+	g++ $(DEP_FLAGS) -c -o $@ $<
 
-$(DEPDIR):
-	@mkdir -p $@
+$(DEPENDS): # empty! (and explicit, so make won't delete them)
 
-DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
-$(DEPFILES): # empty!
+.PHONY: clean
+clean:
+	rm -rf $(OBJECTS) $(DEPENDS)
 
-include $(wildcard $(DEPFILES))
+include $(wildcard $(DEPENDS))
 
 #Copyright (C) 2022  Catherine Van West
 #

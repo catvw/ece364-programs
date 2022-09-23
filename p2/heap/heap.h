@@ -3,6 +3,7 @@
  */
 
 #ifndef HEAP_H
+#define HEAP_H
 
 #include <cstddef>
 #include <string>
@@ -11,6 +12,7 @@
  * So don't ask me.
  */
 class heap {
+public:
 	/* Error codes used by heap functions, because apparently we're not allowed
 	 * to throw exceptions.
 	 */
@@ -56,14 +58,13 @@ class heap {
 	               void* data_ptr = nullptr);
 
 	/* Remove the node with the given id from the binary heap. See deleteMin()
-	 * for how these pointers are used.
+	 * for how the two subsequent pointers are used.
 	 */
-	code remove(std::string* id_ptr = nullptr,
+	code remove(const std::string& id,
 	            int* key_ptr = nullptr,
 	            void* data_ptr = nullptr);
 };
 
-#define HEAP_H
 #endif
 
 /*
