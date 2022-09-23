@@ -1,23 +1,35 @@
-useHeap.exe: useHeap.o heap.o hash.o
-	g++ -o useHeap.exe useHeap.o heap.o hash.o
+# copied shamelessly from http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 
-useHeap.o: useHeap.cpp
-	g++ -c useHeap.cpp
+SRCS=$(wildcard *.c *.cpp *.c++)
 
-heap.o: heap.cpp heap.h
-	g++ -c heap.cpp
+DEPDIR = .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-hash.o: hash.cpp hash.h
-	g++ -c hash.cpp
+CC = g++
+CPPFLAGS = -std=c++11
+COMPILE = $(CC) $(DEPFLAGS) $(CPPFLAGS)
 
-debug:
-	g++ -g -o useHeapDebug.exe useHeap.cpp heap.cpp hash.cpp
+%.o: %.c $(DEPDIR)/%.d | $(DEPDIR)
 
-clean:
-	rm -f *.exe *.o *.stackdump *~
+$(DEPDIR):
+	@mkdir -p $@
 
-backup:
-	test -d backups || mkdir backups
-	cp *.cpp backups
-	cp *.h backups
-	cp Makefile backups
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES): # empty!
+
+include $(wildcard $(DEPFILES))
+
+#Copyright (C) 2022  Catherine Van West
+#
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <https://www.gnu.org/licenses/>.
