@@ -5,13 +5,18 @@
 SOURCES := $(wildcard *.cpp */*.cpp)
 OBJECTS := $(SOURCES:%.cpp=%.o)
 DEPENDS := $(SOURCES:%.cpp=%.d)
+
+COMPILER = g++
+FLAGS = -std=c++11
 DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
+C++ = $(COMPILER) $(FLAGS)
+C++.o = $(C++) -c $(DEP_FLAGS)
 
 useHeap: $(OBJECTS)
-	g++ -o $@ $(OBJECTS)
+	$(C++) -o $@ $(OBJECTS)
 
 %.o: %.cpp %.d
-	g++ $(DEP_FLAGS) -c -o $@ $<
+	$(C++.o) -o $@ $<
 
 $(DEPENDS): # empty! (and explicit, so make won't delete them)
 
