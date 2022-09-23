@@ -1,19 +1,24 @@
 # copied in part from http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 
 .SUFFIXES:
+VPATH = ../p1/
 
-SOURCES := $(wildcard *.cpp */*.cpp)
-OBJECTS := $(SOURCES:%.cpp=%.o)
+TARGET_SOURCES := $(wildcard targ/*.cpp)
+OBJECT_SOURCES := $(wildcard heap/*.cpp hash/*.cpp)
+SOURCES := $(TARGET_SOURCES) $(OBJECT_SOURCES)
+
+TARGETS := $(TARGET_SOURCES:%.cpp=%.out)
+OBJECTS := $(OBJECT_SOURCES:%.cpp=%.o)
 DEPENDS := $(SOURCES:%.cpp=%.d)
 
 COMPILER = g++
-FLAGS = -std=c++11
+FLAGS = -std=c++11 -I. -I../p1/ -Iheap
 DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 C++ = $(COMPILER) $(FLAGS)
 C++.o = $(C++) -c $(DEP_FLAGS)
 
-useHeap: $(OBJECTS)
-	$(C++) -o $@ $(OBJECTS)
+$(TARGETS): %.out: %.o $(OBJECTS)
+	$(C++) -o $@ $^
 
 %.o: %.cpp %.d
 	$(C++.o) -o $@ $<
@@ -22,7 +27,7 @@ $(DEPENDS): # empty! (and explicit, so make won't delete them)
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJECTS) $(DEPENDS)
+	rm -rf $(TARGETS) $(OBJECTS) $(DEPENDS)
 
 include $(wildcard $(DEPENDS))
 
