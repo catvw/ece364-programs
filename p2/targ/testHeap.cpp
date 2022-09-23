@@ -1,0 +1,61 @@
+/* Simple program to run a few heap-related tests, so I can be relatively sure
+ * that everything works.
+ *
+ * I didn't feel like spooling up a full-on testing framework for this, so
+ * this'll have to do.
+ */
+
+#include "heap/heap.h"
+#include <cstddef>
+//#include <cstdlib>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+#define ASSERT(thing, message) assert(__LINE__, thing, message)
+static inline void assert(size_t line, bool thing, const char* message) {
+	if (!thing) {
+		cerr << "\e[31mfailure\e[0m (line " << line
+		     << "): " << message << '\n';
+		//exit(line);
+	}
+}
+
+int main() {
+	size_t capacity = 3;
+	heap test_heap(capacity);
+
+	// ensure that we can insert three things
+	ASSERT(
+		test_heap.insert("first", 19, nullptr) == heap::success,
+		"could not insert into heap"
+	);
+	ASSERT(
+		test_heap.insert("second", 66, nullptr) == heap::success,
+		"could not insert into heap"
+	);
+	ASSERT(
+		test_heap.insert("third", -12, nullptr) == heap::success,
+		"could not insert into heap"
+	);
+
+	return 0;
+}
+
+/*
+Copyright (C) 2022  Catherine Van West
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/

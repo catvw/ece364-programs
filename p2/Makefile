@@ -17,6 +17,15 @@ DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 C++ = $(COMPILER) $(FLAGS)
 C++.o = $(C++) -c $(DEP_FLAGS)
 
+.PHONY: all use test
+all: $(TARGETS)
+
+use: targ/useHeap.out
+	./$<
+
+test: targ/testHeap.out
+	./$<
+
 $(TARGETS): %.out: %.o $(OBJECTS)
 	$(C++) -o $@ $^
 
