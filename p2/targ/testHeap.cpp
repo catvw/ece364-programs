@@ -67,6 +67,12 @@ int main() {
 	ASSERT(key == 19, "wrong key returned");
 	ASSERT(data == addresses, "wrong data returned");
 
+	// ensure we can't insert a duplicate id
+	ASSERT(
+		test_heap.insert("second", 83, addresses + 5) == heap::id_exists,
+		"insert() allowed a duplicate key!"
+	);
+
 	// ensure we empty out the heap
 	ASSERT(
 		test_heap.deleteMin(&id, &key, &data) == heap::success,
