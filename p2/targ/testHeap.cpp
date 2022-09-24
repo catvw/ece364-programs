@@ -81,7 +81,22 @@ int main() {
 		"insert() allowed a duplicate key!"
 	);
 
+	// see if we can change the order by setting a key
+	ASSERT(
+		test_heap.setKey("sixth", -188) == heap::no_such_id,
+		"setKey() allowed setting a nonexistent key!"
+	);
+	ASSERT(
+		test_heap.setKey("fifth", -188) == heap::success,
+		"setKey() did not report success"
+	);
+
 	// ensure we empty out the heap in the right order
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "fifth", "wrong id returned");
 	ASSERT(
 		test_heap.deleteMin(&id) == heap::success,
 		"deleteMin() did not report success"
@@ -92,11 +107,6 @@ int main() {
 		"deleteMin() did not report success"
 	);
 	ASSERT(id == "second", "wrong id returned");
-	ASSERT(
-		test_heap.deleteMin(&id) == heap::success,
-		"deleteMin() did not report success"
-	);
-	ASSERT(id == "fifth", "wrong id returned");
 
 	// ensure that the heap reads as empty
 	ASSERT(

@@ -27,7 +27,11 @@ heap::code heap::insert(const std::string& id, int key, void* data) {
 }
 
 heap::code heap::setKey(const std::string& id, int key) {
-	return heap::success;
+	// remove and re-insert the element with a new key
+	void* data;
+	heap::code report = remove(id, nullptr, &data);
+	if (report == heap::success) insert(id, key, data);
+	return report;
 }
 
 heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
