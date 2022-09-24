@@ -86,9 +86,10 @@ private:
 	   return the address found */
 	size_t percolateUp(int key);
 
-	/* perform a percolate-down operation and return the removed root of the
+	/* perform a percolate-down operation, optionally not starting at the root,
+	   and return the removed element of the
 	   heap */
-	element percolateDown();
+	element percolateDown(std::ptrdiff_t address = 1);
 };
 
 #endif

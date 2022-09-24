@@ -45,6 +45,18 @@ heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
 }
 
 heap::code heap::remove(const std::string& id, int* key_ptr, void* data_ptr) {
+	// ensure we have an item that matches
+	if (!element_table.contains(id)) return heap::no_such_id;
+
+	// extract the item we need
+	ptrdiff_t address = static_cast<element*>(element_table.getPointer(id))
+	                    - &elements[0];
+	auto e = percolateDown(address);
+	element_table.remove(e.id);
+
+	// copy it out and return it
+	if (key_ptr) *key_ptr = e.key;
+	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
 	return heap::success;
 }
 
@@ -59,6 +71,7 @@ size_t heap::percolateUp(int key) {
 		if (parent.key > key) {
 			// move parent to child and keep looking
 			child = parent;
+			element_table.setPointer(parent.id, &child);
 		} else break; // we found our spot!
 
 		address /= 2;
@@ -67,12 +80,11 @@ size_t heap::percolateUp(int key) {
 	return address;
 }
 
-heap::element heap::percolateDown() {
-	auto root = elements[1];
+heap::element heap::percolateDown(ptrdiff_t address) {
+	auto root = elements[address];
 	auto& last = elements[filled];
-	size_t address = 1;
 
-	while (address < filled/2) {
+	while (address <= filled/2) {
 		auto& parent = elements[address];
 		auto& left = elements[address*2];
 		auto& right = elements[address*2 + 1];
@@ -89,6 +101,7 @@ heap::element heap::percolateDown() {
 		// now, see if we should actually move it
 		if (last.key < swap_with->key) {
 			parent = *swap_with;
+			element_table.setPointer(swap_with->id, &parent);
 			address = next_address;
 		} else {
 			break;
@@ -97,6 +110,7 @@ heap::element heap::percolateDown() {
 
 	// insert the last element where we left off
 	elements[address] = last;
+	element_table.setPointer(last.id, &elements[address]);
 	--filled;
 	return root;
 }
