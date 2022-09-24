@@ -89,9 +89,10 @@ size_t heap::percolateUp(int key) {
 
 heap::element heap::percolateDown(ptrdiff_t address) {
 	auto root = elements[address];
-	auto& last = elements[filled];
+	auto& last = elements[filled]; // the element that needs to move
 
 	while (address <= filled/2) {
+		// basically: pretend last is where parent is, and swap accordingly
 		auto& parent = elements[address];
 		auto& left = elements[address*2];
 		auto& right = elements[address*2 + 1];
