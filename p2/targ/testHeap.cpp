@@ -13,12 +13,15 @@
 
 using namespace std;
 
+// oh god, a global variable
+int failures = 0;
+
 #define ASSERT(thing, message) assert(__LINE__, thing, message)
 static inline void assert(size_t line, bool thing, const char* message) {
 	if (!thing) {
 		cerr << "\e[31mfailure\e[0m (line " << line
 		     << "): " << message << '\n';
-		//exit(line);
+		++failures;
 	}
 }
 
@@ -114,7 +117,7 @@ int main() {
 		"deleteMin() should have reported empty"
 	);
 
-	return 0;
+	return failures;
 }
 
 /*
