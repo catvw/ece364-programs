@@ -8,7 +8,7 @@ heap::heap(size_t capacity)
   elements(capacity + 1), // because we don't use address 0
   element_table(capacity) {}
 
-heap::code heap::insert(const std::string& id, int key, void* data) {
+heap::code heap::insert(const string& id, int key, void* data) {
 	// make sure we can actually insert this thing
 	if (filled == capacity) return heap::heap_full;
 	if (element_table.contains(id)) return heap::id_exists;
@@ -26,7 +26,7 @@ heap::code heap::insert(const std::string& id, int key, void* data) {
 	return heap::success;
 }
 
-heap::code heap::setKey(const std::string& id, int key) {
+heap::code heap::setKey(const string& id, int key) {
 	// remove and re-insert the element with a new key
 	void* data;
 	heap::code report = remove(id, nullptr, &data);
@@ -34,7 +34,7 @@ heap::code heap::setKey(const std::string& id, int key) {
 	return report;
 }
 
-heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
+heap::code heap::deleteMin(string* id_ptr, int* key_ptr, void* data_ptr) {
 	// make sure we can delete something
 	if (filled == 0) return heap::heap_empty;
 
@@ -48,7 +48,7 @@ heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
 	return heap::success;
 }
 
-heap::code heap::remove(const std::string& id, int* key_ptr, void* data_ptr) {
+heap::code heap::remove(const string& id, int* key_ptr, void* data_ptr) {
 	// ensure we have an item that matches
 	if (!element_table.contains(id)) return heap::no_such_id;
 
