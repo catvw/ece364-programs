@@ -2,9 +2,27 @@
 
 using namespace std;
 
-heap::heap(size_t size) {}
+heap::heap(size_t capacity)
+: capacity{capacity},
+  filled{0},
+  elements(capacity + 1), // because we don't use address 0
+  element_table(capacity) {}
 
 heap::code heap::insert(const std::string& id, int key, void* data) {
+	// make sure we can actually insert this thing
+	if (filled == capacity) return heap::heap_full;
+	if (element_table.contains(id)) return heap::id_exists;
+
+	// open up a space in the heap for the new element
+	size_t address = percolateUp(key);
+
+	// store the element in both the heap and the table
+	auto& e = elements[address];
+	e.id = id;
+	e.key = key;
+	e.data = data;
+	element_table.insert(id, static_cast<void*>(&e));
+
 	return heap::success;
 }
 
@@ -18,6 +36,10 @@ heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
 
 heap::code heap::remove(const std::string& id, int* key_ptr, void* data_ptr) {
 	return heap::success;
+}
+
+size_t heap::percolateUp(int key) {
+	return 0;
 }
 
 /*

@@ -5,8 +5,10 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+#include "hash/hash.h"
 #include <cstddef>
 #include <string>
+#include <vector>
 
 /* This is actually a *binary* heap, but hey -- I didn't write the interface.
  * So don't ask me.
@@ -63,6 +65,26 @@ public:
 	code remove(const std::string& id,
 	            int* key_ptr = nullptr,
 	            void* data_ptr = nullptr);
+
+private:
+	/* represents a single element of the heap */
+	struct element {
+		std::string id;
+		int key;
+		void* data;
+	};
+
+	/* the heap itself */
+	std::vector<element> elements;
+	std::size_t capacity;
+	std::size_t filled;
+
+	/* a table of elements by unique id, so that we can do quick lookups */
+	hashTable element_table;
+
+	/* perform a percolate-up operation for an element with the given key and
+	   return the address found */
+	size_t percolateUp(int key);
 };
 
 #endif

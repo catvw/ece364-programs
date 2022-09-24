@@ -1,10 +1,10 @@
 # copied in part from http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 
 .SUFFIXES:
-VPATH = ../p1/
+VPATH = ../p1
 
 TARGET_SOURCES := $(wildcard targ/*.cpp)
-OBJECT_SOURCES := $(wildcard heap/*.cpp hash/*.cpp)
+OBJECT_SOURCES := $(wildcard heap/*.cpp ../p1/hash/*.cpp)
 SOURCES := $(TARGET_SOURCES) $(OBJECT_SOURCES)
 
 TARGETS := $(TARGET_SOURCES:%.cpp=%.out)
