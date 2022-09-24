@@ -39,7 +39,22 @@ heap::code heap::remove(const std::string& id, int* key_ptr, void* data_ptr) {
 }
 
 size_t heap::percolateUp(int key) {
-	return 0;
+	// don't call this if we're out of free space!
+	size_t address = ++filled;
+
+	while (address > 1) {
+		auto& child = elements[address];
+		auto& parent = elements[address/2];
+
+		if (parent.key > key) {
+			// move parent to child and keep looking
+			child = parent;
+		} else break; // we found our spot!
+
+		address /= 2;
+	}
+
+	return address;
 }
 
 /*

@@ -11,13 +11,16 @@ TARGETS := $(TARGET_SOURCES:%.cpp=%.out)
 OBJECTS := $(OBJECT_SOURCES:%.cpp=%.o)
 DEPENDS := $(SOURCES:%.cpp=%.d)
 
-COMPILER = g++
-FLAGS = -std=c++11 -I. -I../p1/ -Iheap
+ALL_OBJECTS := $(SOURCES:%.cpp=%.o) # mostly for cleaning
+
+COMPILER = clang++-13
+DEBUGGER = lldb-13
+FLAGS = -g -std=c++11 -I. -I../p1/ -Iheap
 DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 C++ = $(COMPILER) $(FLAGS)
 C++.o = $(C++) -c $(DEP_FLAGS)
 
-.PHONY: all use test
+.PHONY: all use test debug-test
 all: $(TARGETS)
 
 use: targ/useHeap.out
@@ -25,6 +28,9 @@ use: targ/useHeap.out
 
 test: targ/testHeap.out
 	./$<
+
+debug-test: targ/testHeap.out
+	$(DEBUGGER) $<
 
 $(TARGETS): %.out: %.o $(OBJECTS)
 	$(C++) -o $@ $^
@@ -36,7 +42,7 @@ $(DEPENDS): # empty! (and explicit, so make won't delete them)
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGETS) $(OBJECTS) $(DEPENDS)
+	rm -rf $(TARGETS) $(ALL_OBJECTS) $(DEPENDS)
 
 include $(wildcard $(DEPENDS))
 
