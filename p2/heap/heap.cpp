@@ -54,6 +54,19 @@ heap::code heap::remove(const string& id, int* key_ptr, void* data_ptr) {
 	return heap::success;
 }
 
+/*
+	Thoughts on heap manipulation:
+
+	This would be far more elegant if the hash table owned the elements, and
+	the heap just contained pointers to them. One would not have to worry about
+	re-inserting elements into the table, which would both simplify the code
+	(slightly) and likely improve speed, as there would be far fewer table
+	accesses. I imagine you *wanted* us to deal with the headache of keeping
+	the table consistent, so that's what I did, but a templatized hash table
+	would have allowed for a more efficient, cleaner heap (as well as being
+	more in line with C++'s philosophy).
+*/
+
 size_t heap::percolateUp(int key) {
 	// don't call this if we're out of free space!
 	size_t address = ++filled;
