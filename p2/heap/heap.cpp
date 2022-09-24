@@ -38,13 +38,8 @@ heap::code heap::deleteMin(string* id_ptr, int* key_ptr, void* data_ptr) {
 	// make sure we can delete something
 	if (filled == 0) return heap::heap_empty;
 
-	// actually remove the element & copy out fields
-	auto e = percolateDown();
-	element_table.remove(e.id);
-	if (id_ptr) *id_ptr = e.id;
-	if (key_ptr) *key_ptr = e.key;
-	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
-
+	// actually remove the element
+	extract(id_ptr, key_ptr, data_ptr);
 	return heap::success;
 }
 
@@ -55,12 +50,7 @@ heap::code heap::remove(const string& id, int* key_ptr, void* data_ptr) {
 	// extract the item we need
 	ptrdiff_t address = static_cast<element*>(element_table.getPointer(id))
 	                    - &elements[0];
-	auto e = percolateDown(address);
-	element_table.remove(e.id);
-
-	// copy it out and return it
-	if (key_ptr) *key_ptr = e.key;
-	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
+	extract(nullptr, key_ptr, data_ptr, address);
 	return heap::success;
 }
 
@@ -117,6 +107,16 @@ heap::element heap::percolateDown(ptrdiff_t address) {
 	element_table.setPointer(last.id, &elements[address]);
 	--filled;
 	return root;
+}
+
+void heap::extract(string* id_ptr, int* key_ptr,
+                   void* data_ptr, ptrdiff_t address) {
+	// should not be called in invalid situations, so
+	auto e = percolateDown(address);
+	element_table.remove(e.id);
+	if (id_ptr) *id_ptr = e.id;
+	if (key_ptr) *key_ptr = e.key;
+	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
 }
 
 /*

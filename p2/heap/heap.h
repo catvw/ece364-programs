@@ -90,6 +90,13 @@ private:
 	   and return the removed element of the
 	   heap */
 	element percolateDown(std::ptrdiff_t address = 1);
+
+	/* extract an item from the heap, starting at the given address, and copy
+	   out its data to the passed pointers */
+	void extract(std::string* id_ptr = nullptr,
+	             int* key_ptr = nullptr,
+	             void* data_ptr = nullptr,
+	             std::ptrdiff_t address = 1);
 };
 
 #endif
