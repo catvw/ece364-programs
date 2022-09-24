@@ -99,7 +99,7 @@ heap::element heap::percolateDown(ptrdiff_t address) {
 		}
 
 		// now, see if we should actually move it
-		if (last.key < swap_with->key) {
+		if (last.key > swap_with->key) {
 			parent = *swap_with;
 			element_table.setPointer(swap_with->id, &parent);
 			address = next_address;

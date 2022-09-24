@@ -23,7 +23,7 @@ static inline void assert(size_t line, bool thing, const char* message) {
 }
 
 int main() {
-	size_t capacity = 3;
+	size_t capacity = 5;
 	heap test_heap(capacity);
 	char addresses[32];
 
@@ -40,10 +40,18 @@ int main() {
 		test_heap.insert("third", -12, addresses + 2) == heap::success,
 		"could not insert into heap"
 	);
+	ASSERT(
+		test_heap.insert("fourth", -12, addresses + 3) == heap::success,
+		"could not insert into heap"
+	);
+	ASSERT(
+		test_heap.insert("fifth", 127, addresses + 4) == heap::success,
+		"could not insert into heap"
+	);
 
 	// ensure that we cannot insert another
 	ASSERT(
-		test_heap.insert("fourth", -71, addresses  + 3) == heap::heap_full,
+		test_heap.insert("sixth", -71, addresses  + 5) == heap::heap_full,
 		"could still insert into heap!"
 	);
 
@@ -73,12 +81,24 @@ int main() {
 		"insert() allowed a duplicate key!"
 	);
 
-	// ensure we empty out the heap
+	// ensure we empty out the heap in the right order
 	ASSERT(
-		test_heap.deleteMin(&id, &key, &data) == heap::success,
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "fourth", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
 		"deleteMin() did not report success"
 	);
 	ASSERT(id == "second", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "fifth", "wrong id returned");
+
+	// ensure that the heap reads as empty
 	ASSERT(
 		test_heap.deleteMin() == heap::heap_empty,
 		"deleteMin() should have reported empty"
