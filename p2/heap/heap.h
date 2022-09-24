@@ -85,6 +85,10 @@ private:
 	/* perform a percolate-up operation for an element with the given key and
 	   return the address found */
 	size_t percolateUp(int key);
+
+	/* perform a percolate-down operation and return the removed root of the
+	   heap */
+	element percolateDown();
 };
 
 #endif

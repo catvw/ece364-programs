@@ -31,6 +31,16 @@ heap::code heap::setKey(const std::string& id, int key) {
 }
 
 heap::code heap::deleteMin(std::string* id_ptr, int* key_ptr, void* data_ptr) {
+	// make sure we can delete something
+	if (filled == 0) return heap::heap_empty;
+
+	// actually remove the element & copy out fields
+	auto e = percolateDown();
+	element_table.remove(e.id);
+	if (id_ptr) *id_ptr = e.id;
+	if (key_ptr) *key_ptr = e.key;
+	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
+
 	return heap::success;
 }
 
@@ -55,6 +65,40 @@ size_t heap::percolateUp(int key) {
 	}
 
 	return address;
+}
+
+heap::element heap::percolateDown() {
+	auto root = elements[1];
+	auto& last = elements[filled];
+	size_t address = 1;
+
+	while (address < filled/2) {
+		auto& parent = elements[address];
+		auto& left = elements[address*2];
+		auto& right = elements[address*2 + 1];
+
+		auto* swap_with = &left;
+		size_t next_address = address*2;
+
+		if (address*2 + 1 <= filled && right.key < left.key) {
+			// both addresses are valid and the rightmost one should move
+			swap_with = &right;
+			++next_address;
+		}
+
+		// now, see if we should actually move it
+		if (last.key < swap_with->key) {
+			parent = *swap_with;
+			address = next_address;
+		} else {
+			break;
+		}
+	}
+
+	// insert the last element where we left off
+	elements[address] = last;
+	--filled;
+	return root;
 }
 
 /*
