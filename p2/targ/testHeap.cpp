@@ -10,6 +10,7 @@
 //#include <cstdlib>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -59,7 +60,7 @@ int main() {
 	);
 
 	// see if we can perform a deleteMin and get everything back
-	std::string id;
+	string id;
 	int key = 0;
 	char* data = addresses - 1;
 	ASSERT(
@@ -116,6 +117,23 @@ int main() {
 		test_heap.deleteMin() == heap::heap_empty,
 		"deleteMin() should have reported empty"
 	);
+
+	// ensure that this also just functions as a queue
+	vector<string> ids {
+		"first", "second", "third", "fourth", "fifth"
+	};
+
+	for (auto& next : ids) {
+		test_heap.insert(next, -1, nullptr);
+	}
+
+	for (auto& next : ids) {
+		test_heap.deleteMin(&id);
+		ASSERT(
+			id == next,
+			(string("yielded \"") + id + "\", not \""+ next + "\"").c_str()
+		);
+	}
 
 	return failures;
 }

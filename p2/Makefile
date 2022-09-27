@@ -13,9 +13,9 @@ DEPENDS := $(SOURCES:%.cpp=%.d)
 
 ALL_OBJECTS := $(SOURCES:%.cpp=%.o) # mostly for cleaning
 
-COMPILER = clang++-13
-DEBUGGER = lldb-13
-FLAGS = -g -fstandalone-debug -std=c++11 -I. -I../p1/ -Iheap
+COMPILER = g++
+DEBUGGER = lldb
+FLAGS = -g -std=c++11 -I. -I../p1/ -Iheap
 DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 C++ = $(COMPILER) $(FLAGS)
 C++.o = $(C++) -c $(DEP_FLAGS)
