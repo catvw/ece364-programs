@@ -143,25 +143,6 @@ int main() {
 	test_heap.deleteMin(&id);
 	ASSERT(id == "first", "heap order didn't change?");
 
-/*
-	// ensure that this also just functions as a queue
-	vector<string> ids {
-		"first", "second", "third", "fourth", "fifth"
-	};
-
-	for (auto& next : ids) {
-		test_heap.insert(next, -1, nullptr);
-	}
-
-	for (auto& next : ids) {
-		test_heap.deleteMin(&id);
-		ASSERT(
-			id == next,
-			(string("yielded \"") + id + "\", not \""+ next + "\"").c_str()
-		);
-	}
-*/
-
 	return failures;
 }
 
