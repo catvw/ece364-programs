@@ -27,35 +27,43 @@ static inline void assert(size_t line, bool thing, const char* message) {
 }
 
 int main() {
-	size_t capacity = 5;
+	size_t capacity = 7;
 	heap test_heap(capacity);
 	char addresses[32];
 
-	// ensure that we can insert three things
+	// ensure that we can insert enough things
 	ASSERT(
 		test_heap.insert("first", 19, addresses) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
-		test_heap.insert("second", 66, addresses + 1) == heap::success,
+		test_heap.insert("second", -12, addresses + 1) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
-		test_heap.insert("third", -12, addresses + 2) == heap::success,
+		test_heap.insert("third", 5, addresses + 2) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
-		test_heap.insert("fourth", -12, addresses + 3) == heap::success,
+		test_heap.insert("fourth", 66, addresses + 3) == heap::success,
 		"could not insert into heap"
 	);
 	ASSERT(
 		test_heap.insert("fifth", 127, addresses + 4) == heap::success,
 		"could not insert into heap"
 	);
+	ASSERT(
+		test_heap.insert("sixth", -6, addresses + 5) == heap::success,
+		"could not insert into heap"
+	);
+	ASSERT(
+		test_heap.insert("seventh", 3, addresses + 6) == heap::success,
+		"could not insert into heap"
+	);
 
 	// ensure that we cannot insert another
 	ASSERT(
-		test_heap.insert("sixth", -71, addresses  + 5) == heap::heap_full,
+		test_heap.insert("eighth", -71, addresses  + 7) == heap::heap_full,
 		"could still insert into heap!"
 	);
 
@@ -67,50 +75,63 @@ int main() {
 		test_heap.deleteMin(&id, &key, &data) == heap::success,
 		"deleteMin() did not report success"
 	);
-	ASSERT(id == "third", "wrong id returned");
+	ASSERT(id == "second", "wrong id returned");
 	ASSERT(key == -12, "wrong key returned");
-	ASSERT(data == addresses + 2, "wrong data returned");
+	ASSERT(data == addresses + 1, "wrong data returned");
 
 	// see about removing something specific
 	ASSERT(
-		test_heap.remove("first", &key, &data) == heap::success,
+		test_heap.remove("fourth", &key, &data) == heap::success,
 		"remove() did not report success"
 	);
-	ASSERT(key == 19, "wrong key returned");
-	ASSERT(data == addresses, "wrong data returned");
+	ASSERT(key == 66, "wrong key returned");
+	ASSERT(data == addresses + 3, "wrong data returned");
+
 
 	// ensure we can't insert a duplicate id
 	ASSERT(
-		test_heap.insert("second", 83, addresses + 5) == heap::id_exists,
+		test_heap.insert("sixth", 83, addresses + 7) == heap::id_exists,
 		"insert() allowed a duplicate key!"
 	);
 
+/*
 	// see if we can change the order by setting a key
 	ASSERT(
-		test_heap.setKey("sixth", -188) == heap::no_such_id,
+		test_heap.setKey("eighth", -188) == heap::no_such_id,
 		"setKey() allowed setting a nonexistent key!"
 	);
 	ASSERT(
-		test_heap.setKey("fifth", -188) == heap::success,
+		test_heap.setKey("seventh", -188) == heap::success,
 		"setKey() did not report success"
 	);
+*/
 
 	// ensure we empty out the heap in the right order
 	ASSERT(
 		test_heap.deleteMin(&id) == heap::success,
 		"deleteMin() did not report success"
 	);
+	ASSERT(id == "sixth", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "seventh", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "third", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
+	ASSERT(id == "first", "wrong id returned");
+	ASSERT(
+		test_heap.deleteMin(&id) == heap::success,
+		"deleteMin() did not report success"
+	);
 	ASSERT(id == "fifth", "wrong id returned");
-	ASSERT(
-		test_heap.deleteMin(&id) == heap::success,
-		"deleteMin() did not report success"
-	);
-	ASSERT(id == "fourth", "wrong id returned");
-	ASSERT(
-		test_heap.deleteMin(&id) == heap::success,
-		"deleteMin() did not report success"
-	);
-	ASSERT(id == "second", "wrong id returned");
 
 	// ensure that the heap reads as empty
 	ASSERT(
