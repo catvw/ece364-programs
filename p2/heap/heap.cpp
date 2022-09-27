@@ -13,8 +13,8 @@ heap::code heap::insert(const string& id, int key, void* data) {
 	if (filled == capacity) return heap::heap_full;
 	if (element_table.contains(id)) return heap::id_exists;
 
-	// open up a space in the heap for the new element
-	size_t address = percolateUp(key);
+	// open up a space in the heap for the new element, starting at the new end
+	size_t address = percolateUp(key, ++filled);
 
 	// store the element in both the heap and the table
 	auto& e = elements[address];
@@ -67,10 +67,7 @@ heap::code heap::remove(const string& id, int* key_ptr, void* data_ptr) {
 	more in line with C++'s philosophy).
 */
 
-size_t heap::percolateUp(int key, std::ptrdiff_t address) {
-	// don't call this if we're out of free space!
-	if (!address) address = ++filled;
-
+ptrdiff_t heap::percolateUp(int key, ptrdiff_t address) {
 	while (address > 1) {
 		auto& child = elements[address];
 		auto& parent = elements[address/2];
@@ -87,8 +84,7 @@ size_t heap::percolateUp(int key, std::ptrdiff_t address) {
 	return address;
 }
 
-heap::element heap::percolateDown(ptrdiff_t address) {
-	auto root = elements[address];
+ptrdiff_t heap::percolateDown(ptrdiff_t address) {
 	auto& last = elements[filled]; // the element that needs to move
 
 	while (address <= filled/2) {
@@ -116,24 +112,28 @@ heap::element heap::percolateDown(ptrdiff_t address) {
 		}
 	}
 
-	// ensure that this doesn't violate the heap order!
-	address = percolateUp(last.key, address);
-
-	// insert the last element where we left off
-	elements[address] = last;
-	element_table.setPointer(last.id, &elements[address]);
-	--filled;
-	return root;
+	return address;
 }
 
 void heap::extract(string* id_ptr, int* key_ptr,
                    void* data_ptr, ptrdiff_t address) {
-	// should not be called in invalid situations, so
-	auto e = percolateDown(address);
+	// pull out the element we need
+	auto e = elements[address];
+
+	// hang onto the last element in the heap
+	auto last = elements[filled];
+
+	/* perform a percolateDown() followed by a percolateUp(), to maintain the
+	   heap ordering property, then put the last heap element there */
+	address = percolateUp(last.key, percolateDown(address));
+	elements[address] = last;
+	element_table.setPointer(last.id, &elements[address]);
+
 	element_table.remove(e.id);
 	if (id_ptr) *id_ptr = e.id;
 	if (key_ptr) *key_ptr = e.key;
 	if (data_ptr) *static_cast<void**>(data_ptr) = e.data;
+	--filled;
 }
 
 /*

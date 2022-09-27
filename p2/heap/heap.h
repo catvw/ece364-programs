@@ -82,14 +82,15 @@ private:
 	/* a table of elements by unique id, so that we can do quick lookups */
 	hashTable element_table;
 
-	/* perform a percolate-up operation for an element with the given key,
-	   optionally at the given address, and return the address found */
-	size_t percolateUp(int key, std::ptrdiff_t address = 0);
+	/* perform a percolate-up operation for an element with the given key
+	   starting at the given address, and return the address where the hole
+	   landed */
+	std::ptrdiff_t percolateUp(int key, std::ptrdiff_t address);
 
-	/* perform a percolate-down operation, optionally not starting at the root,
-	   and return the removed element of the
-	   heap */
-	element percolateDown(std::ptrdiff_t address = 1);
+	/* perform a percolate-down operation starting at the given address, and
+	   return the address where the last heap element landed; this *will*
+	   overwrite the starting element! */
+	std::ptrdiff_t percolateDown(std::ptrdiff_t address);
 
 	/* extract an item from the heap, starting at the given address, and copy
 	   out its data to the passed pointers */
