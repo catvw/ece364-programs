@@ -67,9 +67,9 @@ heap::code heap::remove(const string& id, int* key_ptr, void* data_ptr) {
 	more in line with C++'s philosophy).
 */
 
-size_t heap::percolateUp(int key) {
+size_t heap::percolateUp(int key, std::ptrdiff_t address) {
 	// don't call this if we're out of free space!
-	size_t address = ++filled;
+	if (!address) address = ++filled;
 
 	while (address > 1) {
 		auto& child = elements[address];
@@ -115,6 +115,9 @@ heap::element heap::percolateDown(ptrdiff_t address) {
 			break;
 		}
 	}
+
+	// ensure that this doesn't violate the heap order!
+	address = percolateUp(last.key, address);
 
 	// insert the last element where we left off
 	elements[address] = last;

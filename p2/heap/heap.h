@@ -82,9 +82,9 @@ private:
 	/* a table of elements by unique id, so that we can do quick lookups */
 	hashTable element_table;
 
-	/* perform a percolate-up operation for an element with the given key and
-	   return the address found */
-	size_t percolateUp(int key);
+	/* perform a percolate-up operation for an element with the given key,
+	   optionally at the given address, and return the address found */
+	size_t percolateUp(int key, std::ptrdiff_t address = 0);
 
 	/* perform a percolate-down operation, optionally not starting at the root,
 	   and return the removed element of the
