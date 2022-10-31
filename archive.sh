@@ -4,6 +4,10 @@
 make -C p1/ clean
 tar acvf p1.tar.gz p1/Makefile p1/test.sh p1/main.cpp p1/hash/ p1/spell/ p1/ref/
 
+# archive program 2
+make -C p2/ clean
+tar acvf p2.tar.gz p1/hash/ p2/Makefile p2/heap/ p2/targ/
+
 #Copyright (C) 2022  Catherine Van West
 #
 #This program is free software: you can redistribute it and/or modify
