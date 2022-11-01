@@ -44,12 +44,13 @@ private:
 		std::string name;
 		std::vector<edge> edges;
 
-		// used for pathfinding algorithm!
+		// used for the pathfinding algorithm!
+		mutable bool known;
 		mutable unsigned int distance;
 		mutable vertex* previous;
-
 	};
 
+	std::vector<std::string> vertices; // so that we can iterate over them
 	mutable hashTable adj_list; // XXX: should be better qualified itself!
 
 	// because I *never* get to use this, and there aren't enough friends

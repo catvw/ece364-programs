@@ -36,6 +36,7 @@ void graph::add_vertex(const string& n) {
 	if (!has_vertex(n)) {
 		// hey, *you* made me do this, not me
 		adj_list.insert(n, new vertex(n));
+		vertices.push_back(n);
 	}
 }
 

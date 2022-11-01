@@ -15,7 +15,7 @@ ALL_OBJECTS := $(SOURCES:%.cpp=%.o) # mostly for cleaning
 
 COMPILER = g++
 DEBUGGER = lldb
-FLAGS = -g -std=c++11 -I. -I../p1/ -Iheap
+FLAGS = -g -std=c++11 -I. -I../p1/ -I../p2/ -Iheap
 DEP_FLAGS = -MT $@ -MMD -MP -MF $*.d
 C++ = $(COMPILER) $(FLAGS)
 C++.o = $(C++) -c $(DEP_FLAGS)
