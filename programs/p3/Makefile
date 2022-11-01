@@ -43,6 +43,7 @@ $(DEPENDS): # empty! (and explicit, so make won't delete them)
 .PHONY: clean
 clean:
 	rm -rf $(TARGETS) $(ALL_OBJECTS) $(DEPENDS)
+	rm -rf tmp/
 
 include $(wildcard $(DEPENDS))
 
