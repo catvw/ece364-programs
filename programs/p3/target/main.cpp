@@ -47,7 +47,8 @@ int main(int argc, char** argv) {
 		std::ifstream graph_file(prompt("Enter name of graph file: "));
 		read_file(graph_file, graph_str);
 	} else {
-		graph_str = argv[1];
+		std::ifstream graph_file(argv[1]);
+		read_file(graph_file, graph_str);
 	}
 	graph g(graph_str);
 
