@@ -4,7 +4,10 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+class graph;
+
 #include "hash/hash.h"
+#include "path.h"
 #include <string>
 #include <vector>
 
@@ -40,9 +43,17 @@ private:
 
 		std::string name;
 		std::vector<edge> edges;
+
+		// used for pathfinding algorithm!
+		mutable unsigned int distance;
+		mutable vertex* previous;
+
 	};
 
 	mutable hashTable adj_list; // XXX: should be better qualified itself!
+
+	// because I *never* get to use this, and there aren't enough friends
+	friend pathtree find_best_paths(const graph&, const std::string&);
 };
 
 #endif
