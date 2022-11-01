@@ -12,7 +12,7 @@ graph::graph(const string& g) {
 	while (not_eof) {
 		string from;
 		string to;
-		unsigned int cost;
+		int cost;
 
 		not_eof = !(in >> from).eof();
 		if (not_eof) { // we got something!
@@ -22,9 +22,7 @@ graph::graph(const string& g) {
 	}
 }
 
-void graph::add_edge(const string& from,
-                     const string& to,
-                     unsigned int cost) {
+void graph::add_edge(const string& from, const string& to, int cost) {
 	add_vertex(from);
 	add_vertex(to);
 
@@ -46,7 +44,7 @@ bool graph::has_vertex(const string& n) const {
 
 graph::vertex::vertex(const string& name) : name{name} { }
 
-void graph::vertex::add_edge(const string& to, unsigned int cost) {
+void graph::vertex::add_edge(const string& to, int cost) {
 	// note: should probably check if this edge already exists, but...
 	edges.push_back(move(edge{to, cost}));
 }

@@ -19,9 +19,7 @@ public:
 
 	/* Add an edge to the graph, with a given cost. Vertices are not required
 	   to exist prior to their use here. */
-	void add_edge(const std::string& from,
-	              const std::string& to,
-	              unsigned int);
+	void add_edge(const std::string& from, const std::string& to, int);
 
 	/* Add an unconnected vertex to the graph. */
 	void add_vertex(const std::string&);
@@ -32,21 +30,21 @@ public:
 private:
 	struct edge {
 		std::string to; // string id, for now
-		unsigned int cost;
+		int cost;
 	};
 
 	struct vertex {
 		vertex(const std::string&);
 
 		/* Add an outbound edge with the given cost. */
-		void add_edge(const std::string& to, unsigned int);
+		void add_edge(const std::string& to, int);
 
 		std::string name;
 		std::vector<edge> edges;
 
 		// used for the pathfinding algorithm!
 		mutable bool known;
-		mutable unsigned int distance;
+		mutable int distance;
 		mutable vertex* previous;
 	};
 

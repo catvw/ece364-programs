@@ -1,11 +1,12 @@
 #include "path.h"
 
 #include "heap/heap.h"
+#include <limits>
 
 using namespace std;
 
 // because no path will EVER be longer than this... right?
-constexpr const unsigned int nearly_infinite = static_cast<unsigned int>(-1);
+constexpr const int nearly_infinite = std::numeric_limits<int>::max();
 
 pathtree find_best_paths(const graph& g, const string& v) {
 	using edge = graph::edge;
@@ -35,7 +36,7 @@ pathtree find_best_paths(const graph& g, const string& v) {
 
 		for (auto& e : vert->edges) {
 			vertex* next = static_cast<vertex*>(g.adj_list.getPointer(e.to));
-			unsigned int new_dist = dist + e.cost;
+			int new_dist = dist + e.cost;
 			
 			// not in the known set and should be updated
 			if (!next->known && new_dist < next->distance) {
