@@ -26,6 +26,7 @@ pathtree find_best_paths(const graph& g, const string& v) {
 
 	// set the root vertex to distance zero
 	vertex* root = static_cast<vertex*>(g.adj_list.getPointer(v));
+	root->distance = 0;
 	h.setKey(v, 0);
 
 	std::string id;
@@ -65,6 +66,8 @@ pathtree find_best_paths(const graph& g, const string& v) {
 			}
 			prev = prev->previous;
 		}
+
+		tree.paths.push_back(p);
 	}
 
 	return tree;
