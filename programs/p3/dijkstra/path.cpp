@@ -55,6 +55,7 @@ pathtree find_best_paths(const graph& g, const string& v) {
 
 		// walk backwards to the root vertex
 		path p;
+		p.to = vert->name;
 		p.distance = vert->distance;
 		vertex* prev = vert;
 		while (prev) {
@@ -73,8 +74,24 @@ pathtree find_best_paths(const graph& g, const string& v) {
 	return tree;
 }
 
-ostream& operator<<(ostream& os, const pathtree& p) {
-	os << "TODO\n";
+ostream& operator<<(ostream& os, const pathtree& tree) {
+	for (auto& path : tree.paths) {
+		auto size = path.vertices.size();
+		
+		// write out the path tree
+		os << path.to << ": ";
+		if (size == 0) os << "NO PATH\n";
+		else { // there is a path, so print it
+			os << path.distance << " [";
+
+			// since the paths are reversed, walk from the end to the start
+			for (auto i = size - 1; i > 0; --i) {
+				os << path.vertices[i] << ", ";
+			}
+			os << path.vertices[0] << "]\n";
+		}
+	}
+
 	return os;
 }
 

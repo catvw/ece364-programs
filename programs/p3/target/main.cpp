@@ -64,9 +64,9 @@ int main(int argc, char** argv) {
 	}
 
 	// apply Dijkstra's algorithm
-	pathtree p;
+	pathtree tree;
 	time_and_report([&]() {
-		p = find_best_paths(g, start_vertex);
+		tree = find_best_paths(g, start_vertex);
 	}, "Total time (in seconds) to apply Dijkstra's algorithm: ");
 
 	std::string out_file;
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 	}
 
 	std::ofstream out(out_file);
-	out << p;
+	out << tree;
 	return 0;
 }
 

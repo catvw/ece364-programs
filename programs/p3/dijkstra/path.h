@@ -16,6 +16,7 @@ public:
 
 private:
 	struct path {
+		std::string to;
 		std::vector<std::string> vertices;
 		int distance;
 	};
