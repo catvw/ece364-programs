@@ -1,16 +1,15 @@
 #!/bin/bash
-
-# archive program 1
-make -C p1/ clean
-tar acvf p1.tar.gz p1/Makefile p1/test.sh p1/main.cpp p1/hash/ p1/spell/ p1/ref/
-
-# archive program 2
-make -C p2/ clean
-tar acvf p2.tar.gz p1/hash/ p2/Makefile p2/heap/ p2/targ/
-
-# archive program 3
-make -C p3/ clean
-tar acvf p3.tar.gz p1/hash/ p2/heap/ p3/Makefile p3/test.sh p3/ref p3/dijkstra p3/target
+mkdir -p tmp/
+if [ $# -eq 2 ]; then # we should call this with a debugger
+	lldb $1 -- ref/test_graph v1 out_v1
+else
+	echo -e 'ref/test_graph\nv1\ntmp/out_v1' | ./$1
+	echo -e 'ref/test_graph\nv5\ntmp/out_v5' | ./$1
+	echo
+	diff ref/out_v1 tmp/out_v1
+	diff ref/out_v5 tmp/out_v5
+	echo
+fi
 
 #Copyright (C) 2022  Catherine Van West
 #
