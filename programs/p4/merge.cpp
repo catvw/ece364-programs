@@ -1,6 +1,7 @@
 #include <cctype>
 #include <cstddef>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -50,7 +51,6 @@ pair<bool, string> is_merge_of(const string& merge,
 			reverse = false; // no need to keep reversing
 		} else if (end_of_m && end_of_s1 && end_of_s2) {
 			// made it to the end!
-			cout << ret << '\n';
 			return pair<bool, string>(true, ret);
 		} else { // try backing up
 			if (s1 == string1.begin()) { // can't back up!
@@ -66,14 +66,30 @@ pair<bool, string> is_merge_of(const string& merge,
 }
 
 int main() {
-	string string1 = "zzzzzzzzzzzzzzzzzzzzab";
-	string string2 = "zzzzzzzzzzzzzzzzzzzzac";
-	string merge = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzacab";
-	pair<bool, string> result = is_merge_of(merge, string1, string2);
+	string input;
+	read: { // for scoping
+		ifstream in_file(prompt("Enter name of input file: "));
+		read_file(in_file, input);
+	}
 
-	cout << "is " << merge << " a merge of " << string1 << " and " << string2
-	     << "? " << (result.first ? "yes" : "no") << '\n';
-	if (result.first) cout << "result: " << result.second << '\n';
+	istringstream in_stream(input);
+	ostringstream output;
+	string string1;
+	string string2;
+	string merge;
+	while (!getline(in_stream, string1).eof()) {
+		getline(in_stream, string2);
+		getline(in_stream, merge);
+
+		auto result = is_merge_of(merge, string1, string2);
+		if (result.first) output << result.second << '\n';
+		else output << "*** NOT A MERGE ***\n";
+	}
+
+	write: {
+		ofstream out_file(prompt("Enter name of output file: "));
+		out_file << output.str();
+	}
 
 	return 0;
 }
