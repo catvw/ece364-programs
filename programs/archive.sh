@@ -12,6 +12,10 @@ tar acvf p2.tar.gz p1/hash/ p2/Makefile p2/heap/ p2/targ/
 make -C p3/ clean
 tar acvf p3.tar.gz p1/hash/ p2/heap/ p3/Makefile p3/test.sh p3/ref p3/dijkstra p3/target
 
+# archive program 4
+make -C p4/ clean
+tar acvf p4.tar.gz p4/merge.cpp p4/ref/ p4/test.sh p4/Makefile
+
 #Copyright (C) 2022  Catherine Van West
 #
 #This program is free software: you can redistribute it and/or modify
