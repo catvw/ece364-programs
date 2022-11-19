@@ -1,6 +1,9 @@
-.PHONY: test
+.PHONY: test debug
 test: merge
 	./test.sh merge
+
+debug: merge
+	lldb merge
 
 merge: merge.cpp
 	g++ -g -o merge merge.cpp
