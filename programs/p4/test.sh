@@ -1,4 +1,5 @@
 #!/bin/bash
+python fuzz.py
 mkdir -p tmp/
 echo -e 'ref/in\ntmp/out' | ./$1
 echo -e 'ref/bonus_in\ntmp/bonus_out' | ./$1
