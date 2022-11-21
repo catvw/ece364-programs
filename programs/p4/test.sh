@@ -1,18 +1,21 @@
 #!/bin/bash
-python fuzz.py
 mkdir -p tmp/
 echo -e 'ref/in\ntmp/out' | ./$1
 echo -e 'ref/bonus_in\ntmp/bonus_out' | ./$1
-echo -e 'ref/fuzz_in\ntmp/fuzz_out' | ./$1
 echo
 echo '-- out --'
 diff ref/out tmp/out
 echo
 echo '-- bonus --'
 diff ref/bonus_out tmp/bonus_out
-echo
-echo '-- fuzz --'
-diff ref/fuzz_out tmp/fuzz_out
+if [ $# -eq 2 ]; then
+	echo
+	python fuzz.py
+	echo -e 'ref/fuzz_in\ntmp/fuzz_out' | ./$1
+	echo
+	echo '-- fuzz --'
+	diff ref/fuzz_out tmp/fuzz_out
+fi
 echo
 
 #Copyright (C) 2022  Catherine Van West

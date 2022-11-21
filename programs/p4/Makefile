@@ -2,6 +2,9 @@
 test: merge
 	./test.sh merge
 
+fuzz: merge
+	./test.sh merge --fuzz
+
 debug: merge
 	lldb merge
 
