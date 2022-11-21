@@ -35,8 +35,8 @@ def screw_up(merge):
 	merge = list(merge)
 
 	i = random.choice(range(LENGTH))
-	new_letter = merge[i]
-	while new_letter == merge[i]:
+	new_letter = merge[i].lower()
+	while new_letter == merge[i].lower():
 		new_letter = random_letter()
 	merge[i] = new_letter
 
