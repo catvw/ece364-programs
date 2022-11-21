@@ -1,2 +1,3 @@
 merge
 tmp/*
+ref/fuzz_*
