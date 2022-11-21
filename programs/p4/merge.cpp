@@ -56,13 +56,9 @@ pair<bool, string> is_merge_of(const string& merge,
 			if (s1 == string1.begin()) { // can't back up!
 				return pair<bool, string>(false, "");
 			} else {
-				// reverse as far as might be necessary; we seem to only get
-				// here if there is a string of repeated characters
-				do {
-					--m;
-					--r;
-					--s1;
-				} while (s1 != string1.begin() && *(s1 - 1) == *s2);
+				--m;
+				--r;
+				--s1;
 				reverse = true;
 			}
 		}
