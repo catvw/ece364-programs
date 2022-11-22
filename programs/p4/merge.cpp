@@ -109,52 +109,55 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	while (percolating) {
 		percolating = false;
 
+		// execute a bunch of non-breaking swaps
 		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i]->second) { // send it towards the end
-				/* here's the magic: swap repeated letters as far as they
-				   can go without breaking the ordering of anything after
-				   them, which will eventually pass through a partially
-				   correct answer! */
-
-				if (!m[i + 1]->second) { // going to swap in some manner
-					bool breaking_swap = false;
-
-					if (m[i + 1]->c == m[i]->c) {
-						// same character, try a breaking swap
-						mark_relatively_correct(m_orig, fir, sec);
-						bool is_correct = m[i + 1]->right_rel
-								&& m[i]->right_rel;
-						m[i + 1]->second = true;
-						m[i]->second = false;
-
-						mark_relatively_correct(m_orig, fir, sec);
-						bool will_still_be_correct = m[i + 1]->right_rel
-								&& m[i]->right_rel;
-
-						if (is_correct && !will_still_be_correct) {
-							// we broke it, swap back
-							m[i + 1]->second = false;
-							m[i]->second = true;
-						} else { // success, so should note that
-							percolating = true;
-							breaking_swap = true;
-						}
-					}
-
-					if (!breaking_swap) {
-						/* didn't manage one for some reason, do it the
-						   usual way */
-						swap(m[i + 1], m[i]);
-						percolating = true;
-					}
-
-					print_it(m_orig);
-					print_it(m);
-					cout << '\n';
-				}
+			if (m[i]->second && !m[i + 1]->second && m[i + 1]->c == m[i]->c) {
+				m[i]->second = false;
+				m[i + 1]->second = true;
+				percolating = true;
 			}
 		}
+
+		print_it(m_orig);
+		print_it(m);
+		cout << '\n';
 	}
+
+//				if (!m[i + 1]->second) { // going to swap in some manner
+//					bool breaking_swap = false;
+//
+//					if (m[i + 1]->c == m[i]->c) {
+//						// same character, try a breaking swap
+//						mark_relatively_correct(m_orig, fir, sec);
+//						bool is_correct = m[i + 1]->right_rel
+//								&& m[i]->right_rel;
+//						m[i + 1]->second = true;
+//						m[i]->second = false;
+//
+//						mark_relatively_correct(m_orig, fir, sec);
+//						bool will_still_be_correct = m[i + 1]->right_rel
+//								&& m[i]->right_rel;
+//
+//						if (is_correct && !will_still_be_correct) {
+//							// we broke it, swap back
+//							m[i + 1]->second = false;
+//							m[i]->second = true;
+//						} else { // success, so should note that
+//							percolating = true;
+//							breaking_swap = true;
+//						}
+//					}
+//
+//					if (!breaking_swap) {
+//						/* didn't manage one for some reason, do it the
+//						   usual way */
+//						swap(m[i + 1], m[i]);
+//						percolating = true;
+//					}
+//
+//				}
+//			}
+//		}
 }
 
 /* check if whatever we ended up with after percolating actually constitutes a
