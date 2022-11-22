@@ -222,7 +222,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 					// is the first character of the next second-string block
 					const char looking_for = m[i]->c;
 
-					for (size_t j = i + 2; j < size; ++j) {
+					for (size_t j = i + 1; j < size; ++j) {
 						if (m[j]->second) {
 							if (m[j]->c == looking_for) {
 								// gotcha!
@@ -309,30 +309,10 @@ void manual_case(const string& m, const string& f, const string& s) {
 }
 
 int main() {
-//	// should be sRHYOrhzBl
-//	manual_case("srhyorhzbl", "rhyob", "srhzl");
-//	// should be OgqFkkTQWq
-//	manual_case("ogqfkktqwq", "oftqw", "gqkkq");
-//	// should be JCipDlWWwz
-//	manual_case("jcipdlwwwz", "jcdww", "iplwz");
-//	// should be csLGlElrAB
-//	manual_case("cslglelrab", "lgeab", "csllr");
-//	// should be IeGEgyupXL
-//	manual_case("iegegyupxl", "igexl", "egyup");
-//	// should be DGPdpKjBzs
-//	manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
-//	// should... not loop and not merge
-//	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
-//	// should not loop
-//	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
-	// should be qkOkLKlZKIsRxe
-//	manual_case("qkoklklzkisrxe", "olkzkir", "qkklsxe");
 	// should be JmvMYnVNVvrGet
-//	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
-	// should be FkIWRwZrhdEcMz
-//	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
+	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be sAHRkxfHYqqAQa
-	manual_case("sahrkxfhyqqaqa", "ahrhyaq", "skxfqqa");
+//	manual_case("sahrkxfhyqqaqa", "ahrhyaq", "skxfqqa");
 	return 0;
 
 	string input;
