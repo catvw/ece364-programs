@@ -292,7 +292,9 @@ int main() {
 	//manual_case("iegegyupxl", "igexl", "egyup");
 	// should be DGPdpKjBzs
 	//manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
-	//return 0;
+	// should... not loop and not merge
+	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
+	return 0;
 
 	string input;
 	read: { // for scoping
