@@ -42,6 +42,14 @@ vector<character> create_extra_string(const string& str) {
 	return estr;
 }
 
+vector<character*> create_percolate_reference(vector<character>& m) {
+	vector<character*> m_ref(m.size());
+	for (size_t i = 0; i < m.size(); ++i) {
+		m_ref[i] = &m[i];
+	}
+	return m_ref;
+}
+
 /* mark the earliest possible positions that second-string characters could
    occur */
 bool mark_seconds(vector<character>& m, const string& sec) {
@@ -56,54 +64,88 @@ bool mark_seconds(vector<character>& m, const string& sec) {
 	return sec_i == sec.size(); // placed all the characters!
 }
 
-/* mark which elements of the first string are relatively in the right place
-   TODO: this should go through in original-index order, not this! */
+/* mark which elements of the first string are in the right place relative to
+   its end */
 void mark_relatively_correct(vector<character>& m, const string& fir) {
-	size_t fir_i = 0;
-	for (size_t i = 0; i < m.size() && fir_i < fir.size(); ++i) {
+	ssize_t fir_i = fir.length() - 1;
+	for (size_t i = m.size() - 1; i >= 0 && fir_i >= 0; --i) {
 		if (!m[i].second) {
 			m[i].right_rel = m[i].c == fir[fir_i];
-			++fir_i;
+			--fir_i;
 		}
 	}
 }
 
 void print_it(vector<character>& m) {
 	// print out what we got
+	cout << "o: ";
 	for (size_t i = 0; i < m.size(); ++i) {
 		cout << (char) (m[i].second ? m[i].c : toupper(m[i].c));
 	}
 	cout << '\n';
 }
 
+void print_it(vector<character*>& m) {
+	// print out what we got
+	cout << "r: ";
+	for (size_t i = 0; i < m.size(); ++i) {
+		cout << (char) (m[i]->second ? m[i]->c : toupper(m[i]->c));
+	}
+	cout << '\n';
+}
+
 /* percolate second characters towards the end of the string */
-void percolate(vector<character>& m, const string& fir, const string& sec) {
-	const size_t size = m.size();
+void percolate(vector<character>& m_orig, const string& fir, const string& sec) {
+	const size_t size = m_orig.size();
+	vector<character*> m = create_percolate_reference(m_orig);
 
 	bool percolating = true;
 	while (percolating) {
 		percolating = false;
 
 		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i].second) { // send it towards the end
-				mark_relatively_correct(m, fir);
+			if (m[i]->second) { // send it towards the end
 
 				for (size_t j = i; j < size - 1; ++j) {
-					/* here's the magic: swaps are done as expected for different
-					   letters, but they *do not change index* for the same
-					   letters! */
+					/* here's the magic: swap repeated letters as far as they
+					   can go without breaking the ordering of anything after
+					   them, which will eventually pass through a partially
+					   correct answer! */
 
-					if (!m[j + 1].second) { // do a swap
-						if (m[j + 1].c == m[j].c && !m[j + 1].right_rel) { // ONLY swap markers!
-							swap(m[j + 1].second, m[j].second);
-						} else { // full swap
+					if (!m[j + 1]->second) { // going to swap in some manner
+						bool breaking_swap = false;
+
+						if (m[j + 1]->c == m[j]->c) {
+							// same character, try a breaking swap
+							mark_relatively_correct(m_orig, fir);
+							bool is_correct = m[j + 1]->right_rel;
+							m[j + 1]->second = true;
+							m[j]->second = false;
+
+							mark_relatively_correct(m_orig, fir);
+							bool will_still_be_correct = m[j]->right_rel;
+
+							if (is_correct && !will_still_be_correct) {
+								// we broke it, swap back
+								m[j + 1]->second = false;
+								m[j]->second = true;
+							} else { // success, so should note that
+								percolating = true;
+								breaking_swap = true;
+							}
+						}
+
+						if (!breaking_swap) {
+							/* didn't manage one for some reason, do it the
+							   usual way */
 							swap(m[j + 1], m[j]);
 						}
-						percolating = true;
+
+						print_it(m_orig);
+						print_it(m);
+						cout << '\n';
 					}
 				}
-
-				print_it(m);
 			}
 		}
 	}
