@@ -105,6 +105,8 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	const size_t size = m_orig.size();
 	vector<character*> m = create_percolate_reference(m_orig);
 
+	size_t last_forward_swap[2];
+
 	bool percolating = true;
 	while (percolating) {
 		percolating = false;
@@ -178,6 +180,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 								percolating = true;
 								m[last_second]->second = false;
 								m[j]->second = true;
+
+								last_forward_swap[0] = last_second;
+								last_forward_swap[1] = j;
 								goto made_a_long_distance_swap;
 							}
 						}
@@ -203,6 +208,13 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 						if (m[j]->second) {
 							if (m[j]->c == looking_for) {
 								// gotcha!
+
+								if (i == last_forward_swap[0] && j == last_forward_swap[1]) {
+									return; /* we're trying to undo what we
+									           just did, so no merge is
+									           possible (hopefully) */
+								}
+
 								percolating = true;
 								m[i]->second = true;
 								m[j]->second = false;
@@ -294,7 +306,7 @@ int main() {
 	//manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
 	// should... not loop and not merge
 	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
-	return 0;
+	//return 0;
 
 	string input;
 	read: { // for scoping
