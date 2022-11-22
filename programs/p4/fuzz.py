@@ -1,7 +1,7 @@
 import random
 import string
 
-MERGES = 1000
+MERGES = 10000
 LENGTH = 7
 ERROR_RATE = .1
 
@@ -65,7 +65,11 @@ def shove_runs(merge):
 if __name__ == "__main__":
 	random.seed()
 	with open('ref/fuzz_in', 'w') as infile, open('ref/fuzz_out', 'w') as outfile:
-		for _ in range(MERGES):
+		print('generating', end='', flush=True)
+		for i in range(MERGES):
+			if i % 666 == 0:
+				print('.', end='', flush=True)
+
 			a = gen_string(LENGTH)
 			b = gen_string(LENGTH)
 			merge = random_merge(a, b)
@@ -78,3 +82,4 @@ if __name__ == "__main__":
 
 			infile.write(f'{a}\n{b}\n{merge.lower()}\n')
 			outfile.write(f'{expected_out}\n')
+		print(' generated.')
