@@ -1,10 +1,11 @@
 #include <cctype>
 #include <cstddef>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -22,81 +23,9 @@ string read_file(istream& file, string& out) {
 }
 
 pair<bool, string> is_merge_of(const string& merge,
-                               const string& string1,
-                               const string& string2) {
-	auto m = merge.begin();
-	auto s1 = string1.begin();
-	auto s2 = string2.begin();
-	size_t block_length = 0;
-
-	string ret(merge.length(), '\0');
-	auto r = ret.begin();
-
-	bool reverse = false;
-	while (true) {
-		//cout << *s1 << ' ' << *s2 << ' ' << ret << "\n";
-		const bool end_of_m = (m == merge.end());
-		const bool end_of_s1 = (s1 == string1.end());
-		const bool end_of_s2 = (s2 == string2.end());
-
-		if (end_of_m && end_of_s1 && end_of_s2) {
-			// made it to the end!
-			return pair<bool, string>(true, ret);
-		}
-
-		auto s2_ahead = s2 + block_length;
-
-		// if we can consume a character from s1, do so
-		if (!reverse && !end_of_s1 && *s1 == *m) {
-			if (s2_ahead < string2.end() && *s1 == *s2_ahead) {
-				// inside an identical block, so increment
-				++block_length;
-			} else block_length = 0;
-
-			*r = toupper(*m);
-			++m;
-			++r;
-			++s1;
-		} else if (!end_of_s2 && *s2 == *m) { // try the other string
-			*r = tolower(*m);
-			++m;
-			++r;
-			++s2;
-			block_length = 0; // definitely not identical!
-			reverse = false;
-		} else {
-			// go back to the start of the last block
-			m -= block_length;
-			r -= block_length;
-			s1 -= block_length;
-
-			// see if we can use the other block
-			if (s2_ahead < string2.end()
-					&& *s2_ahead == *(m + block_length)) {
-				for (; block_length > 0; --block_length) {
-					*r = tolower(*m);
-					++m;
-					++r;
-					++s2;
-				}
-			} else { // go back to the last fork before this one
-				if (s1 == string1.begin()) { // can't back up further!
-					return pair<bool, string>(false, "");
-				}
-
-				while (*(m - 1) == *(r - 1)) { // while lowercase
-					--m;
-					--r;
-					--s2;
-				}
-
-				--m;
-				--r;
-				--s1; // one more step back
-				reverse = true;
-			}
-		}
-	}
+                               const string& first,
+                               const string& second) {
+	return pair<bool, string>(false, "");
 }
 
 int main() {
@@ -108,14 +37,14 @@ int main() {
 
 	istringstream in_stream(input);
 	ostringstream output;
-	string string1;
-	string string2;
+	string first;
+	string second;
 	string merge;
-	while (!getline(in_stream, string1).eof()) {
-		getline(in_stream, string2);
+	while (!getline(in_stream, first).eof()) {
+		getline(in_stream, second);
 		getline(in_stream, merge);
 
-		auto result = is_merge_of(merge, string1, string2);
+		auto result = is_merge_of(merge, first, second);
 		if (result.first) output << result.second << '\n';
 		else output << "*** NOT A MERGE ***\n";
 	}
