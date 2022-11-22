@@ -64,14 +64,20 @@ bool mark_seconds(vector<character>& m, const string& sec) {
 	return sec_i == sec.size(); // placed all the characters!
 }
 
-/* mark which elements of the first string are in the right place relative to
-   its end */
-void mark_relatively_correct(vector<character>& m, const string& fir) {
+/* mark which elements of each string are in the right place relative to
+   their end */
+void mark_relatively_correct(vector<character>& m,
+                             const string& fir,
+                             const string& sec) {
 	ssize_t fir_i = fir.length() - 1;
-	for (size_t i = m.size() - 1; i >= 0 && fir_i >= 0; --i) {
+	ssize_t sec_i = sec.length() - 1;
+	for (size_t i = m.size() - 1; i >= 0 && fir_i >= 0 && sec_i >= 0; --i) {
 		if (!m[i].second) {
 			m[i].right_rel = m[i].c == fir[fir_i];
 			--fir_i;
+		} else {
+			m[i].right_rel = m[i].c == sec[sec_i];
+			--sec_i;
 		}
 	}
 }
@@ -105,50 +111,76 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 		for (ssize_t i = size - 2; i >= 0; --i) {
 			if (m[i]->second) { // send it towards the end
+				/* here's the magic: swap repeated letters as far as they
+				   can go without breaking the ordering of anything after
+				   them, which will eventually pass through a partially
+				   correct answer! */
 
-				for (size_t j = i; j < size - 1; ++j) {
-					/* here's the magic: swap repeated letters as far as they
-					   can go without breaking the ordering of anything after
-					   them, which will eventually pass through a partially
-					   correct answer! */
+				if (!m[i + 1]->second) { // going to swap in some manner
+					bool breaking_swap = false;
 
-					if (!m[j + 1]->second) { // going to swap in some manner
-						bool breaking_swap = false;
+					if (m[i + 1]->c == m[i]->c) {
+						// same character, try a breaking swap
+						mark_relatively_correct(m_orig, fir, sec);
+						bool is_correct = m[i + 1]->right_rel
+								&& m[i]->right_rel;
+						m[i + 1]->second = true;
+						m[i]->second = false;
 
-						if (m[j + 1]->c == m[j]->c) {
-							// same character, try a breaking swap
-							mark_relatively_correct(m_orig, fir);
-							bool is_correct = m[j + 1]->right_rel;
-							m[j + 1]->second = true;
-							m[j]->second = false;
+						mark_relatively_correct(m_orig, fir, sec);
+						bool will_still_be_correct = m[i + 1]->right_rel
+								&& m[i]->right_rel;
 
-							mark_relatively_correct(m_orig, fir);
-							bool will_still_be_correct = m[j]->right_rel;
-
-							if (is_correct && !will_still_be_correct) {
-								// we broke it, swap back
-								m[j + 1]->second = false;
-								m[j]->second = true;
-							} else { // success, so should note that
-								percolating = true;
-								breaking_swap = true;
-							}
+						if (is_correct && !will_still_be_correct) {
+							// we broke it, swap back
+							m[i + 1]->second = false;
+							m[i]->second = true;
+						} else { // success, so should note that
+							percolating = true;
+							breaking_swap = true;
 						}
-
-						if (!breaking_swap) {
-							/* didn't manage one for some reason, do it the
-							   usual way */
-							swap(m[j + 1], m[j]);
-						}
-
-						print_it(m_orig);
-						print_it(m);
-						cout << '\n';
 					}
+
+					if (!breaking_swap) {
+						/* didn't manage one for some reason, do it the
+						   usual way */
+						swap(m[i + 1], m[i]);
+						percolating = true;
+					}
+
+					print_it(m_orig);
+					print_it(m);
+					cout << '\n';
 				}
 			}
 		}
 	}
+}
+
+/* check if whatever we ended up with after percolating actually constitutes a
+   valid solution */
+bool verify_post(const string& m, const string& fir, const string& sec) {
+	size_t m_i = 0;
+	size_t fir_i = 0;
+	size_t sec_i = 0;
+
+	for (; m_i < m.size(); ++m_i) {
+		if (isupper(m[m_i])) { // came from first
+			// if we ran out of characters or don't match, return!
+			if (fir_i == fir.size() || fir[fir_i] != tolower(m[m_i])) {
+				return false;
+			}
+			++fir_i;
+		} else {
+			if (sec_i == sec.size() || sec[sec_i] != m[m_i]) {
+				return false;
+			}
+			++sec_i;
+		}
+	}
+
+	// finally, see if we made it to the end
+	return m_i == m.size() && fir_i == fir.size() && sec_i == sec.size();
 }
 
 pair<bool, string> is_merge_of(const string& merge,
@@ -163,12 +195,14 @@ pair<bool, string> is_merge_of(const string& merge,
 	print_it(m);
 
 	// reconstruct the string
-	reconstruct: { // for scoping
+reconstruct: { // for scoping
 		string post_merge(merge.length(), '\0');
 		for (auto& e : m) {
 			post_merge[e.orig_pos] = e.second ? e.c : toupper(e.c);
 		}
-		cout << "recon: " << post_merge << '\n';
+
+		if (!verify_post(post_merge, first, second)) goto not_a_merge;
+		return pair<bool, string>(true, post_merge);
 	}
 
 not_a_merge:
@@ -177,6 +211,10 @@ not_a_merge:
 
 int main() {
 	auto res = is_merge_of("cchocholaiptes", "chocolate", "chips");
+	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+	res = is_merge_of("ababacd", "abac", "bad");
+	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+	res = is_merge_of("abab", "ab", "ba");
 	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
 	return 0;
 
