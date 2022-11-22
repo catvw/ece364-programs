@@ -166,8 +166,11 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 					if (last_second >= 0 && m[last_second]->c == looking_for) {
 						// found it, look for a forward match
-						for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
-							if (m[j]->c == looking_for) {
+						for (size_t j = i + 1; j < size; ++j) {
+							if (m[j]->second) {
+								// break if we can't cross it
+								if (m[j]->c != looking_for) break;
+							} else if (m[j]->c == looking_for) {
 								// found it!
 								percolating = true;
 								m[last_second]->second = false;
@@ -252,8 +255,10 @@ int main() {
 	// should be OgqFkkTQWq
 	//manual_case("ogqfkktqwq", "oftqw", "gqkkq");
 	// should be JCipDlWWwz
-	manual_case("jcipdlwwwz", "jcdww", "iplwz");
-	return 0;
+	//manual_case("jcipdlwwwz", "jcdww", "iplwz");
+	// should be csLGlElrAB
+	//manual_case("cslglelrab", "lgeab", "csllr");
+	//return 0;
 
 	string input;
 	read: { // for scoping
