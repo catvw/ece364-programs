@@ -71,32 +71,18 @@ void percolate(vector<character>& m) {
 		print_it(m);
 		percolating = false;
 
-		for (ssize_t i = size - 1; i >= 0; --i) {
-			if (m[i].second) {
-				// move it as far towards the end as possible
-				size_t j = i + 1;
-				while (j < size && !(m[j].c == m[i].c || m[j].second)) {
-					++j;
-				}
-
-				// find out why we stopped
-				if (m[j].second) {
-					// end of block, so insert if we skipped anything
-					if (j > i + 1) {
-						auto second_loc = m.begin() + j;
-						m.insert(second_loc, m[i]);
-
-						auto first_loc = m.begin() + i;
-						m.erase(first_loc, first_loc + 1);
-
-						percolating = true;
+		for (ssize_t i = size - 2; i >= 0; --i) {
+			if (m[i].second) { // swap it with the next in position
+				/* here's the magic: swaps are done as expected for different
+				   letters, but they *do not change index* for the same
+				   letters! */
+				if (!m[i + 1].second) { // do a swap
+					if (m[i + 1].c == m[i].c) { // ONLY swap markers!
+						swap(m[i + 1].second, m[i].second);
+					} else { // full swap
+						swap(m[i + 1], m[i]);
 					}
-				} else if (m[j].c == m[i].c) { // found a duplicate!
-					// see if we can actually perform this swap...
-					m[j].second = true;
-					m[i].second = false;
 					percolating = true;
-					// ... and that's all there is to do here
 				}
 			}
 		}
