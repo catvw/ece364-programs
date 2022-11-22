@@ -34,6 +34,7 @@ pair<bool, string> is_merge_of(const string& merge,
 
 	bool reverse = false;
 	while (true) {
+		//cout << *s1 << ' ' << *s2 << ' ' << ret << "\n";
 		const bool end_of_m = (m == merge.end());
 		const bool end_of_s1 = (s1 == string1.end());
 		const bool end_of_s2 = (s2 == string2.end());
@@ -78,18 +79,21 @@ pair<bool, string> is_merge_of(const string& merge,
 					++r;
 					++s2;
 				}
-			} else { // try backing up further
-				/* logic here: if we're back at the beginning OR the next
-				   returned character back is lowercase (and thus came from
-				   string 2, which we're not allowed to overwrite) */
-				if (r == ret.begin() || *(r - 1) == *(m - 1)) {
+			} else { // go back to the last fork before this one
+				if (s1 == string1.begin()) { // can't back up further!
 					return pair<bool, string>(false, "");
-				} else {
+				}
+
+				while (*(m - 1) == *(r - 1)) { // while lowercase
 					--m;
 					--r;
-					--s1;
-					reverse = true; // fiddlesticks!
+					--s2;
 				}
+
+				--m;
+				--r;
+				--s1; // one more step back
+				reverse = true;
 			}
 		}
 	}
