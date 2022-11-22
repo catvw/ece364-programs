@@ -166,9 +166,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-//		print_it(m_orig);
-//		print_it(m);
-//		cout << '\n';
+		print_it(m_orig);
 
 		if (percolating) continue; // don't make any swaps yet
 
@@ -211,9 +209,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-//		print_it(m_orig);
-//		print_it(m);
-//		cout << '\n';
+		print_it(m_orig);
 
 		// couldn't bring the last thing forward, so try to send the first
 		// thing back
@@ -226,7 +222,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 					// is the first character of the next second-string block
 					const char looking_for = m[i]->c;
 
-					for (size_t j = i + 1; j < size; ++j) {
+					for (size_t j = i + 2; j < size; ++j) {
 						if (m[j]->second) {
 							if (m[j]->c == looking_for) {
 								// gotcha!
@@ -331,7 +327,13 @@ int main() {
 //	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
 	// should be qkOkLKlZKIsRxe
 //	manual_case("qkoklklzkisrxe", "olkzkir", "qkklsxe");
-//	return 0;
+	// should be JmvMYnVNVvrGet
+//	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
+	// should be FkIWRwZrhdEcMz
+//	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
+	// should be sAHRkxfHYqqAQa
+	manual_case("sahrkxfhyqqaqa", "ahrhyaq", "skxfqqa");
+	return 0;
 
 	string input;
 	read: { // for scoping
