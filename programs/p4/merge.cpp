@@ -64,6 +64,23 @@ bool mark_seconds(vector<character>& m, const string& sec) {
 	return sec_i == sec.size(); // placed all the characters!
 }
 
+/* check if the characters not marked as seconds permit a merge */
+bool check_firsts(vector<character>& m, const string& fir) {
+	size_t counts[26];
+	size_t i;
+
+	for (i = 0; i < m.size(); ++i) {
+		if (!m[i].second) ++counts[m[i].c - 'a'];
+	}
+	for (i = 0; i < fir.size(); ++i) {
+		--counts[fir[i] - 'a'];
+	}
+	for (i = 0; i < 26; ++i) {
+		if (counts[i] != 0) return false;
+	}
+	return true; // either they match or some SERIOUS rollover occurred
+}
+
 /* mark which elements of each string are in the right place relative to
    their end */
 void mark_relatively_correct(vector<character>& m,
@@ -204,7 +221,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 					// is the first character of the next second-string block
 					const char looking_for = m[i]->c;
 
-					for (size_t j = i; j < size; ++j) {
+					for (size_t j = i + 1; j < size; ++j) {
 						if (m[j]->second) {
 							if (m[j]->c == looking_for) {
 								// gotcha!
@@ -264,7 +281,7 @@ pair<bool, string> is_merge_of(const string& merge,
                                const string& second) {
 	// try to set up our data structure
 	auto m = create_extra_string(merge);
-	if (!mark_seconds(m, second)) goto not_a_merge;
+	if (!mark_seconds(m, second) || !check_firsts(m, first)) goto not_a_merge;
 
 	// percolate characters towards the end
 	percolate(m, first, second);
@@ -305,8 +322,10 @@ int main() {
 	// should be DGPdpKjBzs
 	//manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
 	// should... not loop and not merge
-	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
-	//return 0;
+	//manual_case("ijtojoqhvn", "itdjo", "jqhvn");
+	// should not loop
+	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
+	return 0;
 
 	string input;
 	read: { // for scoping
