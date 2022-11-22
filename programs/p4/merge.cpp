@@ -69,6 +69,7 @@ bool check_firsts(vector<character>& m, const string& fir) {
 	size_t counts[26];
 	size_t i;
 
+	for (i = 0; i < 26; ++i) counts[i] = 0;
 	for (i = 0; i < m.size(); ++i) {
 		if (!m[i].second) ++counts[m[i].c - 'a'];
 	}
@@ -309,23 +310,23 @@ void manual_case(const string& m, const string& f, const string& s) {
 }
 
 int main() {
-	// should be sRHYOrhzBl
-	//manual_case("srhyorhzbl", "rhyob", "srhzl");
-	// should be OgqFkkTQWq
-	//manual_case("ogqfkktqwq", "oftqw", "gqkkq");
-	// should be JCipDlWWwz
-	//manual_case("jcipdlwwwz", "jcdww", "iplwz");
-	// should be csLGlElrAB
-	//manual_case("cslglelrab", "lgeab", "csllr");
-	// should be IeGEgyupXL
-	//manual_case("iegegyupxl", "igexl", "egyup");
-	// should be DGPdpKjBzs
-	//manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
-	// should... not loop and not merge
-	//manual_case("ijtojoqhvn", "itdjo", "jqhvn");
-	// should not loop
-	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
-	return 0;
+//	// should be sRHYOrhzBl
+//	manual_case("srhyorhzbl", "rhyob", "srhzl");
+//	// should be OgqFkkTQWq
+//	manual_case("ogqfkktqwq", "oftqw", "gqkkq");
+//	// should be JCipDlWWwz
+//	manual_case("jcipdlwwwz", "jcdww", "iplwz");
+//	// should be csLGlElrAB
+//	manual_case("cslglelrab", "lgeab", "csllr");
+//	// should be IeGEgyupXL
+//	manual_case("iegegyupxl", "igexl", "egyup");
+//	// should be DGPdpKjBzs
+//	manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
+//	// should... not loop and not merge
+//	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
+//	// should not loop
+//	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
+//	return 0;
 
 	string input;
 	read: { // for scoping
