@@ -27,6 +27,7 @@ pair<bool, string> is_merge_of(const string& merge,
 	auto m = merge.begin();
 	auto s1 = string1.begin();
 	auto s2 = string2.begin();
+	size_t block_length = 0;
 
 	string ret(merge.length(), '\0');
 	auto r = ret.begin();
@@ -37,8 +38,20 @@ pair<bool, string> is_merge_of(const string& merge,
 		const bool end_of_s1 = (s1 == string1.end());
 		const bool end_of_s2 = (s2 == string2.end());
 
+		if (end_of_m && end_of_s1 && end_of_s2) {
+			// made it to the end!
+			return pair<bool, string>(true, ret);
+		}
+
+		auto s2_ahead = s2 + block_length;
+
 		// if we can consume a character from s1, do so
 		if (!reverse && !end_of_s1 && *s1 == *m) {
+			if (s2_ahead < string2.end() && *s1 == *s2_ahead) {
+				// inside an identical block, so increment
+				++block_length;
+			} else block_length = 0;
+
 			*r = toupper(*m);
 			++m;
 			++r;
@@ -48,18 +61,35 @@ pair<bool, string> is_merge_of(const string& merge,
 			++m;
 			++r;
 			++s2;
-			reverse = false; // no need to keep reversing
-		} else if (end_of_m && end_of_s1 && end_of_s2) {
-			// made it to the end!
-			return pair<bool, string>(true, ret);
-		} else { // try backing up
-			if (s1 == string1.begin()) { // can't back up!
-				return pair<bool, string>(false, "");
-			} else {
-				--m;
-				--r;
-				--s1;
-				reverse = true;
+			block_length = 0; // definitely not identical!
+			reverse = false;
+		} else {
+			// go back to the start of the last block
+			m -= block_length;
+			r -= block_length;
+			s1 -= block_length;
+
+			// see if we can use the other block
+			if (s2_ahead < string2.end()
+					&& *s2_ahead == *(m + block_length)) {
+				for (; block_length > 0; --block_length) {
+					*r = tolower(*m);
+					++m;
+					++r;
+					++s2;
+				}
+			} else { // try backing up further
+				/* logic here: if we're back at the beginning OR the next
+				   returned character back is lowercase (and thus came from
+				   string 2, which we're not allowed to overwrite) */
+				if (r == ret.begin() || *(r - 1) == *(m - 1)) {
+					return pair<bool, string>(false, "");
+				} else {
+					--m;
+					--r;
+					--s1;
+					reverse = true; // fiddlesticks!
+				}
 			}
 		}
 	}
