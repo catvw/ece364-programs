@@ -143,9 +143,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-		print_it(m_orig);
-		print_it(m);
-		cout << '\n';
+		//print_it(m_orig);
+		//print_it(m);
+		//cout << '\n';
 
 		// make a single long-distance swap
 		ssize_t last_second = -1;
@@ -225,7 +225,7 @@ pair<bool, string> is_merge_of(const string& merge,
 
 	// percolate characters towards the end
 	percolate(m, first, second);
-	print_it(m);
+	//print_it(m);
 
 	// reconstruct the string
 reconstruct: { // for scoping
@@ -243,13 +243,13 @@ not_a_merge:
 }
 
 int main() {
-	auto res = is_merge_of("cchocholaiptes", "chocolate", "chips");
-	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-	res = is_merge_of("ababacd", "abac", "bad");
-	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-	res = is_merge_of("abab", "ab", "ba");
-	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-	return 0;
+//	auto res = is_merge_of("cchocholaiptes", "chocolate", "chips");
+//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+//	res = is_merge_of("ababacd", "abac", "bad");
+//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+//	res = is_merge_of("abab", "ab", "ba");
+//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+//	return 0;
 
 	string input;
 	read: { // for scoping
