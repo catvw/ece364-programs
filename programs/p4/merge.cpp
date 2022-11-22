@@ -152,15 +152,16 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 		if (percolating) continue; // don't make any swaps yet
 
-		// make a single long-distance swap
+		// try to make a single long-distance swap
 		ssize_t last_second = -1;
 		ssize_t fir_i = 0;
+		bool right = true;
 		for (size_t i = 0; i < size; ++i) {
 			if (m[i]->second) {
 				last_second = i;
 			} else {
 				// first string, so see if it's in the right place
-				bool right = fir[fir_i] == m[i]->c;
+				right = right && fir[fir_i] == m[i]->c;
 				if (!right) {
 					// the only swappable place the missing character could be
 					// is the last character of the last second-string block
@@ -168,7 +169,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 					if (last_second >= 0 && m[last_second]->c == looking_for) {
 						// found it, look for a forward match
-						for (size_t j = i + 1; j < size; ++j) {
+						for (size_t j = last_second + 1; j < size; ++j) {
 							if (m[j]->second) {
 								// break if we can't cross it
 								if (m[j]->c != looking_for) break;
@@ -287,9 +288,10 @@ int main() {
 	//manual_case("jcipdlwwwz", "jcdww", "iplwz");
 	// should be csLGlElrAB
 	//manual_case("cslglelrab", "lgeab", "csllr");
-	//return 0;
 	// should be IeGEgyupXL
 	//manual_case("iegegyupxl", "igexl", "egyup");
+	// should be DGPdpKjBzs
+	//manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
 	//return 0;
 
 	string input;
