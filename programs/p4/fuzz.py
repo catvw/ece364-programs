@@ -2,7 +2,7 @@ import random
 import string
 
 MERGES = 1000
-LENGTH = 5
+LENGTH = 7
 ERROR_RATE = .1
 
 order = [1 for _ in range(LENGTH)] + [0 for _ in range(LENGTH)]

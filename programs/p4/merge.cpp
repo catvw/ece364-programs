@@ -166,9 +166,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-		print_it(m_orig);
-		print_it(m);
-		cout << '\n';
+//		print_it(m_orig);
+//		print_it(m);
+//		cout << '\n';
 
 		if (percolating) continue; // don't make any swaps yet
 
@@ -211,6 +211,10 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
+//		print_it(m_orig);
+//		print_it(m);
+//		cout << '\n';
+
 		// couldn't bring the last thing forward, so try to send the first
 		// thing back
 		fir_i = 0;
@@ -228,9 +232,8 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 								// gotcha!
 
 								if (i == last_forward_swap[0] && j == last_forward_swap[1]) {
-									return; /* we're trying to undo what we
-									           just did, so no merge is
-									           possible (hopefully) */
+									continue; /* we're trying to undo what we
+									             just did */
 								}
 
 								percolating = true;
@@ -326,6 +329,8 @@ int main() {
 //	manual_case("ijtojoqhvn", "itdjo", "jqhvn");
 //	// should not loop
 //	manual_case("qmmhbjczzk", "qbjzk", "mhbcz");
+	// should be qkOkLKlZKIsRxe
+//	manual_case("qkoklklzkisrxe", "olkzkir", "qkklsxe");
 //	return 0;
 
 	string input;
