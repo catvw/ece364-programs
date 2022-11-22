@@ -246,6 +246,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		}
 
 made_a_long_distance_swap:
+		print_it(m_orig);
 		continue; // just to get out
 	}
 }
@@ -313,7 +314,7 @@ int main() {
 	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be sAHRkxfHYqqAQa
 //	manual_case("sahrkxfhyqqaqa", "ahrhyaq", "skxfqqa");
-	return 0;
+//	return 0;
 
 	string input;
 	read: { // for scoping
