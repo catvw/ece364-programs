@@ -137,8 +137,11 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 				}
 
 				// do it
-				for (ssize_t j = start; j <= end; ++j) {
-					m[j]->second = !m[j]->second;
+				if (start <= end) {
+					for (ssize_t j = start; j <= end; ++j) {
+						m[j]->second = !m[j]->second;
+					}
+					percolating = true;
 				}
 			}
 		}
@@ -237,7 +240,21 @@ not_a_merge:
 	return pair<bool, string>(false, "");
 }
 
+void manual_case(const string& m, const string& f, const string& s) {
+	auto res = is_merge_of(m, f, s);
+	cout << "result: " << res.second << '\n';
+	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
+}
+
 int main() {
+	// should be sRHYOrhzBl
+	//manual_case("srhyorhzbl", "rhyob", "srhzl");
+	// should be OgqFkkTQWq
+	//manual_case("ogqfkktqwq", "oftqw", "gqkkq");
+	// should be JCipDlWWwz
+	manual_case("jcipdlwwwz", "jcdww", "iplwz");
+	return 0;
+
 	string input;
 	read: { // for scoping
 		ifstream in_file(prompt("Enter name of input file: "));
