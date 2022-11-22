@@ -150,6 +150,8 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		print_it(m);
 		cout << '\n';
 
+		if (percolating) continue; // don't make any swaps yet
+
 		// make a single long-distance swap
 		ssize_t last_second = -1;
 		ssize_t fir_i = 0;
@@ -184,10 +186,37 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 				++fir_i;
 			}
 		}
-		continue;
+
+		// couldn't bring the last thing forward, so try to send the first
+		// thing back
+		fir_i = 0;
+		for (size_t i = 0; i < size; ++i) {
+			if (!m[i]->second) {
+				bool right = fir[fir_i] == m[i]->c;
+				if (!right) {
+					// the only swappable place the missing character could be
+					// is the first character of the next second-string block
+					const char looking_for = fir[fir_i];
+
+					for (size_t j = i; j < size; ++j) {
+						if (m[j]->second) {
+							if (m[j]->c == looking_for) {
+								// gotcha!
+								percolating = true;
+								m[i]->second = true;
+								m[j]->second = false;
+								goto made_a_long_distance_swap;
+							} else break; // not crossable, so
+						}
+					}
+				}
+
+				++fir_i;
+			}
+		}
 
 made_a_long_distance_swap:
-		percolating = true; // and then actually continue!
+		continue; // just to get out
 	}
 }
 
@@ -258,6 +287,9 @@ int main() {
 	//manual_case("jcipdlwwwz", "jcdww", "iplwz");
 	// should be csLGlElrAB
 	//manual_case("cslglelrab", "lgeab", "csllr");
+	//return 0;
+	// should be IeGEgyupXL
+	//manual_case("iegegyupxl", "igexl", "egyup");
 	//return 0;
 
 	string input;
