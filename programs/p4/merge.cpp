@@ -111,10 +111,35 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 		// execute a bunch of non-breaking swaps
 		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i]->second && !m[i + 1]->second && m[i + 1]->c == m[i]->c) {
-				m[i]->second = false;
-				m[i + 1]->second = true;
-				percolating = true;
+			if (m[i]->second && !m[i + 1]->second) {
+				// hit a string border, so swap the longest possible block
+				ssize_t start = i;
+				size_t end = i + 1;
+
+				// expand outwards as much as possible
+				while (start >= 0 && end < size && m[start]->second && !m[end]->second) {
+					--start;
+					++end;
+				}
+
+				// contract until we can swap
+				bool same = false;
+				while (!same) {
+					++start;
+					--end;
+					const ssize_t block_length = end - i;
+					if (block_length < 0) break;
+
+					same = true;
+					for (ssize_t j = start; j < i + 1; ++j) {
+						same = same && m[j]->c == m[j + block_length]->c;
+					}
+				}
+
+				// do it
+				for (ssize_t j = start; j <= end; ++j) {
+					m[j]->second = !m[j]->second;
+				}
 			}
 		}
 
