@@ -195,9 +195,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			if (!m[i]->second) {
 				bool right = fir[fir_i] == m[i]->c;
 				if (!right) {
-					// the only swappable place the missing character could be
+					// the only swappable place the extra character could be
 					// is the first character of the next second-string block
-					const char looking_for = fir[fir_i];
+					const char looking_for = m[i]->c;
 
 					for (size_t j = i; j < size; ++j) {
 						if (m[j]->second) {
