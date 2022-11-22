@@ -150,35 +150,32 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		// make a single long-distance swap
 		ssize_t last_second = -1;
 		ssize_t fir_i = 0;
-		for (size_t i = 0; i < fir.size(); ++i) {
+		for (size_t i = 0; i < size; ++i) {
 			if (m[i]->second) {
 				last_second = i;
 			} else {
 				// first string, so see if it's in the right place
 				bool right = fir[fir_i] == m[i]->c;
 				if (!right) {
-					// the only place the missing character could possibly be
-					// is the last second-string block
+					// the only swappable place the missing character could be
+					// is the last character of the last second-string block
 					const char looking_for = fir[fir_i];
 
-					while (last_second >= 0 && m[last_second]->second) {
-						if (m[last_second]->c == looking_for) {
-							// found it, look for a forward match
-							for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
-								if (m[j]->c == looking_for) {
-									// found it!
-									percolating = true;
-									m[last_second]->second = false;
-									m[j]->second = true;
-									goto made_a_long_distance_swap;
-								}
+					if (last_second >= 0 && m[last_second]->c == looking_for) {
+						// found it, look for a forward match
+						for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
+							if (m[j]->c == looking_for) {
+								// found it!
+								percolating = true;
+								m[last_second]->second = false;
+								m[j]->second = true;
+								goto made_a_long_distance_swap;
 							}
 						}
-						--last_second;
 					}
-				} else {
-					++fir_i;
 				}
+
+				++fir_i;
 			}
 		}
 		continue;
