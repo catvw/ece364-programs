@@ -100,6 +100,15 @@ pair<bool, string> is_merge_of(const string& merge,
 	percolate(m);
 	print_it(m);
 
+	// reconstruct the string
+	reconstruct: { // for scoping
+		string post_merge(merge.length(), '\0');
+		for (auto& e : m) {
+			post_merge[e.orig_pos] = e.second ? e.c : toupper(e.c);
+		}
+		cout << "recon: " << post_merge << '\n';
+	}
+
 not_a_merge:
 	return pair<bool, string>(false, "");
 }
