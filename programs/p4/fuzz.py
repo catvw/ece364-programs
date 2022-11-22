@@ -1,7 +1,7 @@
 import random
 import string
 
-MERGES = 1000
+MERGES = 10
 LENGTH = 5
 ERROR_RATE = .1
 

@@ -143,9 +143,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-		//print_it(m_orig);
-		//print_it(m);
-		//cout << '\n';
+		print_it(m_orig);
+		print_it(m);
+		cout << '\n';
 
 		// make a single long-distance swap
 		ssize_t last_second = -1;
@@ -161,22 +161,20 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 					// is the last second-string block
 					const char looking_for = fir[fir_i];
 
-					if (last_second > -1) {
-						while (m[last_second]->second) {
-							if (m[last_second]->c == looking_for) {
-								// found it, look for a forward match
-								for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
-									if (m[j]->c == looking_for) {
-										// found it!
-										percolating = true;
-										m[last_second]->second = false;
-										m[j]->second = true;
-										goto made_a_long_distance_swap;
-									}
+					while (last_second >= 0 && m[last_second]->second) {
+						if (m[last_second]->c == looking_for) {
+							// found it, look for a forward match
+							for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
+								if (m[j]->c == looking_for) {
+									// found it!
+									percolating = true;
+									m[last_second]->second = false;
+									m[j]->second = true;
+									goto made_a_long_distance_swap;
 								}
 							}
-							--last_second;
 						}
+						--last_second;
 					}
 				} else {
 					++fir_i;
@@ -243,14 +241,6 @@ not_a_merge:
 }
 
 int main() {
-//	auto res = is_merge_of("cchocholaiptes", "chocolate", "chips");
-//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-//	res = is_merge_of("ababacd", "abac", "bad");
-//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-//	res = is_merge_of("abab", "ab", "ba");
-//	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-//	return 0;
-
 	string input;
 	read: { // for scoping
 		ifstream in_file(prompt("Enter name of input file: "));
