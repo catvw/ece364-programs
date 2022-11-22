@@ -13,6 +13,7 @@ struct character {
 	char c;
 	size_t orig_pos;
 	bool second;
+	bool right_rel;
 };
 
 string prompt(const char* pr) {
@@ -36,6 +37,7 @@ vector<character> create_extra_string(const string& str) {
 		estr[i].c = str[i];
 		estr[i].orig_pos = i;
 		estr[i].second = false;
+		estr[i].right_rel = false;
 	}
 	return estr;
 }
@@ -54,6 +56,18 @@ bool mark_seconds(vector<character>& m, const string& sec) {
 	return sec_i == sec.size(); // placed all the characters!
 }
 
+/* mark which elements of the first string are relatively in the right place
+   TODO: this should go through in original-index order, not this! */
+void mark_relatively_correct(vector<character>& m, const string& fir) {
+	size_t fir_i = 0;
+	for (size_t i = 0; i < m.size() && fir_i < fir.size(); ++i) {
+		if (!m[i].second) {
+			m[i].right_rel = m[i].c == fir[fir_i];
+			++fir_i;
+		}
+	}
+}
+
 void print_it(vector<character>& m) {
 	// print out what we got
 	for (size_t i = 0; i < m.size(); ++i) {
@@ -63,27 +77,33 @@ void print_it(vector<character>& m) {
 }
 
 /* percolate second characters towards the end of the string */
-void percolate(vector<character>& m) {
+void percolate(vector<character>& m, const string& fir, const string& sec) {
 	const size_t size = m.size();
 
 	bool percolating = true;
 	while (percolating) {
-		print_it(m);
 		percolating = false;
 
 		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i].second) { // swap it with the next in position
-				/* here's the magic: swaps are done as expected for different
-				   letters, but they *do not change index* for the same
-				   letters! */
-				if (!m[i + 1].second) { // do a swap
-					if (m[i + 1].c == m[i].c) { // ONLY swap markers!
-						swap(m[i + 1].second, m[i].second);
-					} else { // full swap
-						swap(m[i + 1], m[i]);
+			if (m[i].second) { // send it towards the end
+				mark_relatively_correct(m, fir);
+
+				for (size_t j = i; j < size - 1; ++j) {
+					/* here's the magic: swaps are done as expected for different
+					   letters, but they *do not change index* for the same
+					   letters! */
+
+					if (!m[j + 1].second) { // do a swap
+						if (m[j + 1].c == m[j].c && !m[j + 1].right_rel) { // ONLY swap markers!
+							swap(m[j + 1].second, m[j].second);
+						} else { // full swap
+							swap(m[j + 1], m[j]);
+						}
+						percolating = true;
 					}
-					percolating = true;
 				}
+
+				print_it(m);
 			}
 		}
 	}
@@ -97,7 +117,7 @@ pair<bool, string> is_merge_of(const string& merge,
 	if (!mark_seconds(m, second)) goto not_a_merge;
 
 	// percolate characters towards the end
-	percolate(m);
+	percolate(m, first, second);
 	print_it(m);
 
 	// reconstruct the string
