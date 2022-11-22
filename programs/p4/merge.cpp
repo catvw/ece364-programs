@@ -121,43 +121,48 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		print_it(m_orig);
 		print_it(m);
 		cout << '\n';
-	}
 
-//				if (!m[i + 1]->second) { // going to swap in some manner
-//					bool breaking_swap = false;
-//
-//					if (m[i + 1]->c == m[i]->c) {
-//						// same character, try a breaking swap
-//						mark_relatively_correct(m_orig, fir, sec);
-//						bool is_correct = m[i + 1]->right_rel
-//								&& m[i]->right_rel;
-//						m[i + 1]->second = true;
-//						m[i]->second = false;
-//
-//						mark_relatively_correct(m_orig, fir, sec);
-//						bool will_still_be_correct = m[i + 1]->right_rel
-//								&& m[i]->right_rel;
-//
-//						if (is_correct && !will_still_be_correct) {
-//							// we broke it, swap back
-//							m[i + 1]->second = false;
-//							m[i]->second = true;
-//						} else { // success, so should note that
-//							percolating = true;
-//							breaking_swap = true;
-//						}
-//					}
-//
-//					if (!breaking_swap) {
-//						/* didn't manage one for some reason, do it the
-//						   usual way */
-//						swap(m[i + 1], m[i]);
-//						percolating = true;
-//					}
-//
-//				}
-//			}
-//		}
+		// make a single long-distance swap
+		ssize_t last_second = -1;
+		ssize_t fir_i = 0;
+		for (size_t i = 0; i < fir.size(); ++i) {
+			if (m[i]->second) {
+				last_second = i;
+			} else {
+				// first string, so see if it's in the right place
+				bool right = fir[fir_i] == m[i]->c;
+				if (!right) {
+					// the only place the missing character could possibly be
+					// is the last second-string block
+					const char looking_for = fir[fir_i];
+
+					if (last_second > -1) {
+						while (m[last_second]->second) {
+							if (m[last_second]->c == looking_for) {
+								// found it, look for a forward match
+								for (size_t j = i + 1; j < size && !m[j]->second; ++j) {
+									if (m[j]->c == looking_for) {
+										// found it!
+										percolating = true;
+										m[last_second]->second = false;
+										m[j]->second = true;
+										goto made_a_long_distance_swap;
+									}
+								}
+							}
+							--last_second;
+						}
+					}
+				} else {
+					++fir_i;
+				}
+			}
+		}
+		continue;
+
+made_a_long_distance_swap:
+		percolating = true; // and then actually continue!
+	}
 }
 
 /* check if whatever we ended up with after percolating actually constitutes a
