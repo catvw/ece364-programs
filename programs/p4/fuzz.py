@@ -1,8 +1,8 @@
 import random
 import string
 
-MERGES = 10000
-LENGTH = 10
+MERGES = 100000
+LENGTH = 13
 ERROR_RATE = .1
 
 order = [1 for _ in range(LENGTH)] + [0 for _ in range(LENGTH)]
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	with open('ref/fuzz_in', 'w') as infile, open('ref/fuzz_out', 'w') as outfile:
 		print('generating', end='', flush=True)
 		for i in range(MERGES):
-			if i % 666 == 0:
+			if i % (int(MERGES/100) + 1) == 0:
 				print('.', end='', flush=True)
 
 			a = gen_string(LENGTH)
