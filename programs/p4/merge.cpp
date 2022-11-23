@@ -341,7 +341,7 @@ int main() {
 	// should be vDKZLFkAzzGzkPzCfiCz
 //	manual_case("vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
 //	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
-	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
+//	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
 //	return 0;
 
 	string input;

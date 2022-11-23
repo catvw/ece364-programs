@@ -5,7 +5,7 @@ test: merge
 fuzz: merge ref/fuzz_in
 	./test.sh merge --fuzz
 
-ref/fuzz_in:
+ref/fuzz_in: fuzz.py
 	python fuzz.py
 
 debug: merge
