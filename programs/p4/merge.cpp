@@ -321,10 +321,12 @@ void manual_case(const string& m, const string& f, const string& s) {
 
 int main() {
 	// should be FkIWRwZrhdEcMz
-	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
+//	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
 	// should be JmvMYnVNVvrGet
-	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
-	//return 0;
+//	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
+	// should be gjoWXPBUwSbwlJ
+	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
+	return 0;
 
 	string input;
 	read: { // for scoping
