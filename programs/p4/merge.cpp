@@ -227,42 +227,38 @@ backward_end: ;
 //		print_it(m_orig);
 	}
 
+	// look for blocks of characters that can be optimized
 	percolating = true;
 	while (percolating) {
 		percolating = false;
 
-		// execute a bunch of non-breaking swaps
-		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i]->second && !m[i + 1]->second) {
-				// hit a string border, so swap the longest possible block
-				ssize_t start = i;
-				size_t end = i + 1;
+		for (ssize_t i = 0; i < size; ++i) {
+			if (m[i]->second) {
+				// might be able to improve something here!
+				string comparison(m_orig.size(), '\0');
+				ssize_t first = 0;
+				ssize_t second = 0;
+				ssize_t match_length = 0;
 
-				// expand outwards as much as possible
-				while (start >= 0 && end < size && m[start]->second && !m[end]->second) {
-					--start;
-					++end;
+				for (ssize_t j = i; j < size; ++j) {
+					if (m[j]->second) {
+						comparison[second++] = m[j]->c;
+					} else if (m[j]->c == comparison[first]) {
+						++first;
+					} else break; // mismatching character!
+
+					// see if we have a match
+					if (first == second) match_length = 2*second;
 				}
 
-				// contract until we can swap
-				bool same = false;
-				while (!same) {
-					++start;
-					--end;
-					const ssize_t block_length = end - i;
-					if (block_length < 0) break;
-
-					same = true;
-					for (ssize_t j = start; j < i + 1; ++j) {
-						same = same && m[j]->c == m[j + block_length]->c;
-					}
-				}
-
-				// do it
-				if (start <= end) {
-					for (ssize_t j = start; j <= end; ++j) {
+				if (match_length > 0) {
+					for (ssize_t j = i; j < i + match_length; ++j) {
+						// swap between first and second
 						m[j]->second = !m[j]->second;
 					}
+
+					// advance ahead, we know this is done
+					i = i + match_length;
 					percolating = true;
 				}
 			}
@@ -344,8 +340,9 @@ int main() {
 	//           vDKZLFkAzzGZkPzCfiCz
 	// should be vDKZLFkAzzGzkPzCfiCz
 //	manual_case("vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
-	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
-	return 0;
+//	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
+	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
+//	return 0;
 
 	string input;
 	read: { // for scoping
