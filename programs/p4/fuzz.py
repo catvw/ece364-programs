@@ -2,7 +2,7 @@ import random
 import string
 
 MERGES = 10000
-LENGTH = 7
+LENGTH = 10
 ERROR_RATE = .1
 
 order = [1 for _ in range(LENGTH)] + [0 for _ in range(LENGTH)]
@@ -33,14 +33,15 @@ def random_merge(a, b):
 
 def screw_up(merge):
 	merge = list(merge)
+	indices = random.sample(range(LENGTH), k=2)
 
-	i = random.choice(range(LENGTH))
-	new_letter = merge[i].lower()
-	while new_letter == merge[i].lower():
-		new_letter = random_letter()
-		if random.random() > .5:
-			new_letter = new_letter.upper()
-	merge[i] = new_letter
+	for i in indices:
+		new_letter = merge[i].lower()
+		while new_letter == merge[i].lower():
+			new_letter = random_letter()
+			if random.random() > .5:
+				new_letter = new_letter.upper()
+		merge[i] = new_letter
 
 	return ''.join(merge)
 
