@@ -165,7 +165,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 //								last_forward_swap[0] = last_second;
 //								last_forward_swap[1] = j;
-								goto made_a_long_distance_swap;
+								goto forward_end;
 							}
 						}
 					}
@@ -175,7 +175,9 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
+forward_end:
 		print_it(m_orig);
+
 		// now try to do the same thing in favor of the second string
 		for (ssize_t i = size - 1; i > -1; --i) {
 			if (!m[i]->second) {
@@ -203,7 +205,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 //								last_forward_swap[0] = last_second;
 //								last_forward_swap[1] = j;
-								goto made_a_long_distance_swap;
+								goto backward_end;
 							}
 						}
 					}
@@ -213,9 +215,8 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 			}
 		}
 
-made_a_long_distance_swap:
+backward_end:
 		print_it(m_orig);
-		continue; // just to get out
 	}
 
 	percolating = true;
