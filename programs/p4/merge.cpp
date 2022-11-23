@@ -11,7 +11,7 @@ using namespace std;
 
 struct character {
 	char c;
-	size_t orig_pos;
+	ssize_t orig_pos;
 	bool second;
 	bool right_rel;
 };
@@ -53,7 +53,7 @@ vector<character*> create_percolate_reference(vector<character>& m) {
 /* mark the earliest possible positions that second-string characters could
    occur */
 bool mark_seconds(vector<character>& m, const string& sec) {
-	size_t sec_i = 0;
+	ssize_t sec_i = 0;
 	for (size_t i = 0; i < m.size() && sec_i < sec.size(); ++i) {
 		if (m[i].c == sec[sec_i]) { // found a match, put it here
 			m[i].second = true;
@@ -66,8 +66,8 @@ bool mark_seconds(vector<character>& m, const string& sec) {
 
 /* check if the characters not marked as seconds permit a merge */
 bool check_firsts(vector<character>& m, const string& fir) {
-	size_t counts[26];
-	size_t i;
+	ssize_t counts[26];
+	ssize_t i;
 
 	for (i = 0; i < 26; ++i) counts[i] = 0;
 	for (i = 0; i < m.size(); ++i) {
@@ -190,13 +190,13 @@ forward_end:
 					// is in a previous block of firsts, so find one
 					const char looking_for = sec[sec_i];
 
-					// scroll back to a character that might work
+					// scroll forward to a character that might work
 					for (; last_first < size && m[last_first]->c != looking_for;
 					     ++last_first);
 
 					if (last_first < size) {
 						// found it, look for a backward match
-						for (size_t j = i - 1; j > -1; --j) {
+						for (ssize_t j = i - 1; j > -1; --j) {
 							if (m[j]->second && m[j]->c == looking_for) {
 								// found it!
 								percolating = true;
@@ -265,9 +265,9 @@ backward_end:
 /* check if whatever we ended up with after percolating actually constitutes a
    valid solution */
 bool verify_post(const string& m, const string& fir, const string& sec) {
-	size_t m_i = 0;
-	size_t fir_i = 0;
-	size_t sec_i = 0;
+	ssize_t m_i = 0;
+	ssize_t fir_i = 0;
+	ssize_t sec_i = 0;
 
 	for (; m_i < m.size(); ++m_i) {
 		if (isupper(m[m_i])) { // came from first
@@ -327,6 +327,8 @@ int main() {
 //	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be gjoWXPBUwSbwlJ
 //	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
+	// should be DGPdpKjBzs
+//	manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
 //	return 0;
 
 	string input;
