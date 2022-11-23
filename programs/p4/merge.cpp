@@ -129,46 +129,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	while (percolating) {
 		percolating = false;
 
-		// execute a bunch of non-breaking swaps
-		for (ssize_t i = size - 2; i >= 0; --i) {
-			if (m[i]->second && !m[i + 1]->second) {
-				// hit a string border, so swap the longest possible block
-				ssize_t start = i;
-				size_t end = i + 1;
-
-				// expand outwards as much as possible
-				while (start >= 0 && end < size && m[start]->second && !m[end]->second) {
-					--start;
-					++end;
-				}
-
-				// contract until we can swap
-				bool same = false;
-				while (!same) {
-					++start;
-					--end;
-					const ssize_t block_length = end - i;
-					if (block_length < 0) break;
-
-					same = true;
-					for (ssize_t j = start; j < i + 1; ++j) {
-						same = same && m[j]->c == m[j + block_length]->c;
-					}
-				}
-
-				// do it
-				if (start <= end) {
-					for (ssize_t j = start; j <= end; ++j) {
-						m[j]->second = !m[j]->second;
-					}
-					percolating = true;
-				}
-			}
-		}
-
 		print_it(m_orig);
-
-		if (percolating) continue; // don't make any swaps yet
 
 		// try to make a single long-distance swap
 		ssize_t last_second = -1;
@@ -184,7 +145,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 				if (right) {
 					m[i]->right_rel = true;
 					last_right = i;
-				} else if (last_second > last_right) {
+				} else /*if (last_second > last_right)*/ {
 					// the only swappable place the missing character could be
 					// is the last character of the last second-string block
 					const char looking_for = fir[fir_i];
@@ -256,6 +217,48 @@ made_a_long_distance_swap:
 		print_it(m_orig);
 		continue; // just to get out
 	}
+
+	percolating = true;
+	while (percolating) {
+		percolating = false;
+
+		// execute a bunch of non-breaking swaps
+		for (ssize_t i = size - 2; i >= 0; --i) {
+			if (m[i]->second && !m[i + 1]->second) {
+				// hit a string border, so swap the longest possible block
+				ssize_t start = i;
+				size_t end = i + 1;
+
+				// expand outwards as much as possible
+				while (start >= 0 && end < size && m[start]->second && !m[end]->second) {
+					--start;
+					++end;
+				}
+
+				// contract until we can swap
+				bool same = false;
+				while (!same) {
+					++start;
+					--end;
+					const ssize_t block_length = end - i;
+					if (block_length < 0) break;
+
+					same = true;
+					for (ssize_t j = start; j < i + 1; ++j) {
+						same = same && m[j]->c == m[j + block_length]->c;
+					}
+				}
+
+				// do it
+				if (start <= end) {
+					for (ssize_t j = start; j <= end; ++j) {
+						m[j]->second = !m[j]->second;
+					}
+					percolating = true;
+				}
+			}
+		}
+	}
 }
 
 /* check if whatever we ended up with after percolating actually constitutes a
@@ -317,10 +320,10 @@ void manual_case(const string& m, const string& f, const string& s) {
 }
 
 int main() {
+	// should be FkIWRwZrhdEcMz
+	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
 	// should be JmvMYnVNVvrGet
 	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
-	// should be sAHRkxfHYqqAQa
-	manual_case("sahrkxfhyqqaqa", "ahrhyaq", "skxfqqa");
 	//return 0;
 
 	string input;
