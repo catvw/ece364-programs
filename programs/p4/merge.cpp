@@ -129,7 +129,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	while (percolating) {
 		percolating = false;
 
-//		print_it(m_orig);
+		print_it(m_orig);
 
 		// set up for crazy string battle
 		ssize_t last_second = -1;
@@ -151,8 +151,12 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 					const char looking_for = fir[fir_i];
 
 					// scroll back to a character that might work
-					for (; last_second > -1 && m[last_second]->c != looking_for;
-					     --last_second);
+					for (; last_second > -1; --last_second) {
+						if (m[last_second]->second
+								&& m[last_second]->c == looking_for) {
+							break;
+						}
+					}
 
 					if (last_second > -1) {
 						// found it, look for a forward match
@@ -176,7 +180,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		}
 
 forward_end: ;
-//		print_it(m_orig);
+		print_it(m_orig);
 
 		// now try to do the same thing in favor of the second string
 		for (ssize_t i = size - 1; i > -1; --i) {
@@ -191,8 +195,12 @@ forward_end: ;
 					const char looking_for = sec[sec_i];
 
 					// scroll forward to a character that might work
-					for (; last_first < size && m[last_first]->c != looking_for;
-					     ++last_first);
+					for (; last_first < size; ++last_first) {
+						if (!m[last_first]->second
+								&& m[last_first]->c == looking_for) {
+							break;
+						}
+					}
 
 					if (last_first < size) {
 						// found it, look for a backward match
@@ -216,7 +224,7 @@ forward_end: ;
 		}
 
 backward_end: ;
-//		print_it(m_orig);
+		print_it(m_orig);
 	}
 
 	percolating = true;
@@ -329,7 +337,10 @@ int main() {
 //	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
 	// should be DGPdpKjBzs
 //	manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
-//	return 0;
+	//           vDKZLFkAzzGZkPzCfiCz
+	// should be vDKZLFkAzzGzkPzCfiCz
+	manual_case("vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
+	return 0;
 
 	string input;
 	read: { // for scoping
