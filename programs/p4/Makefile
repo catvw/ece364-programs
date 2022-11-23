@@ -2,8 +2,11 @@
 test: merge
 	./test.sh merge
 
-fuzz: merge
+fuzz: merge ref/fuzz_in
 	./test.sh merge --fuzz
+
+ref/fuzz_in:
+	python fuzz.py
 
 debug: merge
 	lldb merge
@@ -13,7 +16,7 @@ merge: merge.cpp
 
 .PHONY: clean
 clean:
-	rm -rf merge tmp/
+	rm -rf merge tmp/ ref/fuzz_*
 
 #Copyright (C) 2022  Catherine Van West
 #

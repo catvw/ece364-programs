@@ -10,7 +10,6 @@ echo '-- bonus --'
 diff ref/bonus_out tmp/bonus_out
 if [ $# -eq 2 ]; then
 	echo
-	python fuzz.py
 	echo -e 'ref/fuzz_in\ntmp/fuzz_out' | ./$1
 	echo
 	echo '-- fuzz --'
