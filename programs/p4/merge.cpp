@@ -322,8 +322,12 @@ not_a_merge:
 	return pair<bool, string>(false, "");
 }
 
-void manual_case(const string& m, const string& f, const string& s) {
+void manual_case(const string& ex,
+                 const string& m,
+                 const string& f,
+                 const string& s) {
 	auto res = is_merge_of(m, f, s);
+	cout << "expect: " << ex << '\n';
 	cout << "result: " << res.second << '\n';
 	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
 }
@@ -340,7 +344,8 @@ int main() {
 	//           vDKZLFkAzzGZkPzCfiCz
 	// should be vDKZLFkAzzGzkPzCfiCz
 //	manual_case("vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
-//	return 0;
+	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
+	return 0;
 
 	string input;
 	read: { // for scoping
