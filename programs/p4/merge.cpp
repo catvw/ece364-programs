@@ -131,39 +131,40 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 		print_it(m_orig);
 
-		// try to make a single long-distance swap
+		// set up for crazy string battle
 		ssize_t last_second = -1;
-		ssize_t last_right = -1;
 		ssize_t fir_i = 0;
-		bool right = true;
+
+		ssize_t last_first = size;
+		ssize_t sec_i = sec.size() - 1;
+
+		// try to make a single long-distance swap in favor of the first string
 		for (size_t i = 0; i < size; ++i) {
 			if (m[i]->second) {
 				last_second = i;
 			} else {
 				// first string, so see if it's in the right place
-				right = right && fir[fir_i] == m[i]->c;
-				if (right) {
-					m[i]->right_rel = true;
-					last_right = i;
-				} else /*if (last_second > last_right)*/ {
+				bool right = fir[fir_i] == m[i]->c;
+				if (!right) {
 					// the only swappable place the missing character could be
-					// is the last character of the last second-string block
+					// is in a previous block of seconds, so find one
 					const char looking_for = fir[fir_i];
 
-					if (last_second >= 0 && m[last_second]->c == looking_for) {
+					// scroll back to a character that might work
+					for (; last_second > -1 && m[last_second]->c != looking_for;
+					     --last_second);
+
+					if (last_second > -1) {
 						// found it, look for a forward match
-						for (size_t j = last_second + 1; j < size; ++j) {
-							if (m[j]->second) {
-								if (m[j]->c != looking_for) break;
-							} else if (m[j]->c == looking_for) {
+						for (size_t j = i + 1; j < size; ++j) {
+							if (!m[j]->second && m[j]->c == looking_for) {
 								// found it!
 								percolating = true;
 								m[last_second]->second = false;
 								m[j]->second = true;
-								m[last_second]->right_rel = true; // must be!
 
-								last_forward_swap[0] = last_second;
-								last_forward_swap[1] = j;
+//								last_forward_swap[0] = last_second;
+//								last_forward_swap[1] = j;
 								goto made_a_long_distance_swap;
 							}
 						}
@@ -175,41 +176,40 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		}
 
 		print_it(m_orig);
-
-		// couldn't bring the last thing forward, so try to send the first
-		// thing back
-		fir_i = 0;
-		for (size_t i = 0; i < size; ++i) {
+		// now try to do the same thing in favor of the second string
+		for (ssize_t i = size - 1; i > -1; --i) {
 			if (!m[i]->second) {
-				bool right = fir[fir_i] == m[i]->c;
+				last_first = i;
+			} else {
+				// second string, so see if it's in the right place
+				bool right = sec[sec_i] == m[i]->c;
 				if (!right) {
-					// the only swappable place the extra character could be
-					// is the first character of the next second-string block
-					const char looking_for = m[i]->c;
-					ssize_t last_viable = -1;
+					// the only swappable place the missing character could be
+					// is in a previous block of firsts, so find one
+					const char looking_for = sec[sec_i];
 
-					for (size_t j = i + 1; j < size; ++j) {
-						if (m[j]->second) {
-							if (m[j]->c == looking_for) {
-								// gotcha!
-								if (i == last_forward_swap[0] && j == last_forward_swap[1]) {
-									continue; /* we're trying to undo what we
-									             just did */
-								}
-								last_viable = j;
-							} else break; // not crossable, so
+					// scroll back to a character that might work
+					for (; last_first < size && m[last_first]->c != looking_for;
+					     ++last_first);
+
+					if (last_first < size) {
+						// found it, look for a backward match
+						for (size_t j = i - 1; j > -1; --j) {
+							if (m[j]->second && m[j]->c == looking_for) {
+								// found it!
+								percolating = true;
+								m[last_first]->second = true;
+								m[j]->second = false;
+
+//								last_forward_swap[0] = last_second;
+//								last_forward_swap[1] = j;
+								goto made_a_long_distance_swap;
+							}
 						}
-					}
-
-					if (last_viable > -1) {
-						percolating = true;
-						m[i]->second = true;
-						m[last_viable]->second = false;
-						goto made_a_long_distance_swap;
 					}
 				}
 
-				++fir_i;
+				--sec_i;
 			}
 		}
 
@@ -325,8 +325,8 @@ int main() {
 	// should be JmvMYnVNVvrGet
 //	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be gjoWXPBUwSbwlJ
-	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
-	return 0;
+//	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
+//	return 0;
 
 	string input;
 	read: { // for scoping
