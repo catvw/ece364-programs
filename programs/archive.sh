@@ -14,7 +14,7 @@ tar acvf p3.tar.gz p1/hash/ p2/heap/ p3/Makefile p3/test.sh p3/ref p3/dijkstra p
 
 # archive program 4
 make -C p4/ clean
-tar acvf p4.tar.gz p4/merge.cpp p4/ref/ p4/test.sh p4/Makefile p4/fuzz.py
+tar acvf p4.tar.gz p4/*.cpp p4/*.h p4/ref/ p4/test.sh p4/Makefile p4/fuzz.py
 
 #Copyright (C) 2022  Catherine Van West
 #

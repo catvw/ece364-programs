@@ -1,8 +1,7 @@
+#include "merge.h"
 #include <cctype>
 #include <cstddef>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -153,19 +152,6 @@ ostream& operator<<(ostream& out, const merge_t& m) {
 	return out << m.str();
 }
 
-string prompt(const char* pr) {
-	string dict_file;
-	cout << pr;
-	getline(cin, dict_file);
-	return dict_file;
-}
-
-string read_file(istream& file, string& out) {
-	// get until EOF, so long as we don't see any null characters
-	getline(file, out, '\0');
-	return out;
-}
-
 /* percolate incorrect characters in the wrong directions */
 template<typename view_t, typename str_t>
 bool percolate(view_t& m, const str_t s) {
@@ -231,45 +217,6 @@ pair<bool, string> is_merge_of(const string& merge,
 
 not_a_merge:
 	return pair<bool, string>(false, "");
-}
-
-void manual_case(const string& ex,
-                 const string& m,
-                 const string& f,
-                 const string& s) {
-	auto res = is_merge_of(m, f, s);
-	cout << "expect: " << ex << '\n';
-	cout << "result: " << res.second << '\n';
-	cout << "merge: " << (res.first ? "yes" : "no") << '\n';
-}
-
-int main() {
-	string input;
-	read: { // for scoping
-		ifstream in_file(prompt("Enter name of input file: "));
-		read_file(in_file, input);
-	}
-
-	istringstream in_stream(input);
-	ostringstream output;
-	string first;
-	string second;
-	string merge;
-	while (!getline(in_stream, first).eof()) {
-		getline(in_stream, second);
-		getline(in_stream, merge);
-
-		auto result = is_merge_of(merge, first, second);
-		if (result.first) output << result.second << '\n';
-		else output << "*** NOT A MERGE ***\n";
-	}
-
-	write: {
-		ofstream out_file(prompt("Enter name of output file: "));
-		out_file << output.str();
-	}
-
-	return 0;
 }
 
 /*

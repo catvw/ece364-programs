@@ -11,8 +11,8 @@ ref/fuzz_in: fuzz.py
 debug: merge
 	lldb merge
 
-merge: merge.cpp
-	g++ -g -o merge merge.cpp
+merge: main.cpp merge.cpp merge.h
+	g++ -g -o merge main.cpp merge.cpp
 
 .PHONY: clean
 clean:
