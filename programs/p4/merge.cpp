@@ -9,10 +9,149 @@
 
 using namespace std;
 
-struct character {
-	char c;
-	bool second;
+class merge_t {
+private:
+	string merge;
+	vector<bool> second;
+
+public:
+	/* represents a view of the merge, specialized for the crazy stuff I do in
+	   this program */
+	template<typename str_it, typename bool_it, bool forward_it>
+	class view_t {
+	public:
+		/* represents an element of the string */
+		struct element_t {
+			const char c;
+			const bool move_forward;
+			const bool move_backward;
+
+			element_t(char c, bool forward)
+				: c(c), move_forward(forward), move_backward(!forward) { }
+			operator char() { return c; }
+		};
+
+		view_t(merge_t& m, str_it si, bool_it bi)
+		: m(m), si(si), bi(bi) { }
+
+		element_t operator[](size_t i) {
+			// if forward-iterating, first-string characters move forward
+			if (forward_it) return element_t(si[i], !bi[i]);
+			else return element_t(si[i], bi[i]);
+		}
+
+		size_t size() { return m.size(); }
+
+		bool swap(size_t i, size_t j) {
+			if (si[i] != si[j]) return false;
+
+			// can't use ::swap() here, as it doesn't like bitrefs
+			bool t = bi[i];
+			bi[i] = bi[j];
+			bi[j] = t;
+
+			return true;
+		}
+
+	private:
+		merge_t& m;
+		str_it si;
+		bool_it bi;
+	};
+
+	using forward_view = view_t<decltype(merge.begin()),
+	                            decltype(second.begin()),
+	                            true>;
+	using reverse_view = view_t<decltype(merge.rbegin()),
+	                            decltype(second.rbegin()),
+	                            false>;
+
+	merge_t(const string& m) : merge(m), second(m.size()) { }
+
+	/* mark the latest possible positions that second-string characters could
+	   occur */
+	bool mark_seconds(const string& sec) {
+		ssize_t sec_i = sec.size() - 1;
+		for (ssize_t i = merge.size() - 1; i > -1 && sec_i > -1; --i) {
+			if (merge[i] == sec[sec_i]) { // found a match, put it here
+				second[i] = true;
+				--sec_i;
+			}
+		}
+
+		return sec_i == -1; // placed all the characters!
+	}
+
+	/* check if the characters not marked as seconds permit a merge */
+	bool check_firsts(const string& fir) {
+		ssize_t counts[26];
+		ssize_t i;
+
+		for (i = 0; i < 26; ++i) counts[i] = 0;
+		for (i = 0; i < merge.size(); ++i) {
+			if (!second[i]) ++counts[merge[i] - 'a'];
+		}
+		for (i = 0; i < fir.size(); ++i) {
+			--counts[fir[i] - 'a'];
+		}
+		for (i = 0; i < 26; ++i) {
+			if (counts[i] != 0) return false;
+		}
+		return true; // either they match or some SERIOUS rollover occurred
+	}
+
+	/* check if whatever we have is a valid solution */
+	bool verify(const string& fir, const string& sec) {
+		ssize_t m_i = 0;
+		ssize_t fir_i = 0;
+		ssize_t sec_i = 0;
+
+		for (; m_i < merge.size(); ++m_i) {
+			if (!second[m_i]) { // came from first
+				// if we ran out of characters or don't match, return!
+				if (fir_i == fir.size() || fir[fir_i] != merge[m_i]) {
+					return false;
+				}
+				++fir_i;
+			} else {
+				if (sec_i == sec.size() || sec[sec_i] != merge[m_i]) {
+					return false;
+				}
+				++sec_i;
+			}
+		}
+
+		// finally, see if we made it to the end
+		return m_i == merge.size()
+			&& fir_i == fir.size()
+			&& sec_i == sec.size();
+	}
+
+	forward_view forward() {
+		return forward_view(*this, merge.begin(), second.begin());
+	}
+
+	reverse_view reverse() {
+		return reverse_view(*this, merge.rbegin(), second.rbegin());
+	}
+
+	size_t size() {
+		return merge.size();
+	}
+
+	string str() const {
+		string ret(merge);
+		for (size_t i = 0; i < merge.size(); ++i) {
+			// capitalize when necessary
+			if (!second[i]) ret[i] = toupper(ret[i]);
+		}
+		return ret;
+	}
 };
+
+ostream& operator<<(ostream& out, const merge_t& m) {
+	return out << m.str();
+}
 
 string prompt(const char* pr) {
 	string dict_file;
@@ -27,186 +166,82 @@ string read_file(istream& file, string& out) {
 	return out;
 }
 
-/* create a string type with original-position information, so that I can do
-   what I do here */
-vector<character> create_extra_string(const string& str) {
-	vector<character> estr(str.size());
-	for (size_t i = 0; i < str.size(); ++i) {
-		estr[i].c = str[i];
-		estr[i].second = false;
-	}
-	return estr;
-}
+/* percolate incorrect characters in the wrong directions */
+template<typename view_t, typename str_t>
+bool percolate(view_t& m, const str_t s) {
+	const size_t size = m.size();
 
-/* mark the latest possible positions that second-string characters could
-   occur */
-bool mark_seconds(vector<character>& m, const string& sec) {
-	ssize_t sec_i = sec.size() - 1;
-	for (ssize_t i = m.size() - 1; i > -1 && sec_i > -1; --i) {
-		if (m[i].c == sec[sec_i]) { // found a match, put it here
-			m[i].second = true;
-			--sec_i;
+	ssize_t si = 0;
+	for (ssize_t i = 0; i < size; ++i) {
+		if (m[i].move_forward) {
+			// first string, so see if it's in the right place
+			bool right = s[si] == m[i].c;
+			if (!right) {
+				// this character came too soon, so push it into the next
+				// block of seconds
+				const char looking_for = m[i].c;
+
+				// scroll forward to a character that might work
+				ssize_t j = i + 1;
+				for (; j < size; ++j) {
+					if (m[j].move_backward && m[j].c == looking_for) break;
+				}
+
+				if (j < size) {
+					// found one, so do a swap
+					m.swap(i, j);
+					return true;
+				}
+			}
+
+			++si;
 		}
 	}
 
-	return sec_i == -1; // placed all the characters!
+	return false;
 }
 
-/* check if the characters not marked as seconds permit a merge */
-bool check_firsts(vector<character>& m, const string& fir) {
-	ssize_t counts[26];
-	ssize_t i;
+/* improve the strings until they stabilize */
+void improve(merge_t& m, const string& fir, const string& sec) {
+	auto m_for = m.forward();
+	auto fir_for = fir.begin();
 
-	for (i = 0; i < 26; ++i) counts[i] = 0;
-	for (i = 0; i < m.size(); ++i) {
-		if (!m[i].second) ++counts[m[i].c - 'a'];
-	}
-	for (i = 0; i < fir.size(); ++i) {
-		--counts[fir[i] - 'a'];
-	}
-	for (i = 0; i < 26; ++i) {
-		if (counts[i] != 0) return false;
-	}
-	return true; // either they match or some SERIOUS rollover occurred
-}
-
-void print_it(vector<character>& m) {
-	// print out what we got
-	cout << "o: ";
-	for (size_t i = 0; i < m.size(); ++i) {
-		cout << (char) (m[i].second ? m[i].c : toupper(m[i].c));
-	}
-	cout << '\n';
-}
-
-/* percolate characters in the wrong directions */
-void percolate(vector<character>& m, const string& fir, const string& sec) {
-	const size_t size = m.size();
+	auto m_rev = m.reverse();
+	auto sec_rev = sec.rbegin();
 
 	bool percolating = true;
 	while (percolating) {
 		percolating = false;
 
-		//print_it(m_orig);
-
-		// set up for crazy string battle
-		ssize_t fir_i = 0;
-		ssize_t sec_i = sec.size() - 1;
+		cout << m << '\n';
 
 		// try to make a single long-distance swap in favor of the first string
-		for (ssize_t i = 0; i < size; ++i) {
-			if (!m[i].second) {
-				// first string, so see if it's in the right place
-				bool right = fir[fir_i] == m[i].c;
-				if (!right) {
-					// this character came too soon, so push it into the next
-					// block of seconds
-					const char looking_for = m[i].c;
+		percolating = percolating || percolate(m_for, fir_for);
 
-					// scroll forward to a character that might work
-					ssize_t j = i + 1;
-					for (; j < size; ++j) {
-						if (m[j].second && m[j].c == looking_for) break;
-					}
-
-					if (j < size) {
-						// found one, so do a swap
-						m[i].second = true;
-						m[j].second = false;
-						percolating = true;
-						goto forward_end;
-					}
-				}
-
-				++fir_i;
-			}
-		}
-
-forward_end: ;
-		//print_it(m_orig);
+		cout << m << '\n';
 
 		// now try to do the same thing in favor of the second string
-		for (ssize_t i = size - 1; i > -1; --i) {
-			if (m[i].second) {
-				// second string, so see if it's in the right place
-				bool right = sec[sec_i] == m[i].c;
-				if (!right) {
-					// this character came too late, so push it into the next
-					// block of firsts
-					const char looking_for = m[i].c;
+		percolating = percolating || percolate(m_rev, sec_rev);
 
-					// scroll backward to a character that might work
-					ssize_t j = i - 1;
-					for (; j > -1; --j) {
-						if (!m[j].second && m[j].c == looking_for) break;
-					}
-
-					if (j > -1) {
-						// found one, so do a swap
-						m[i].second = false;
-						m[j].second = true;
-						percolating = true;
-						goto backward_end;
-					}
-				}
-
-				--sec_i;
-			}
-		}
-
-backward_end: ;
-		//print_it(m_orig);
+		cout << m << '\n';
 	}
-}
-
-/* check if whatever we ended up with after percolating actually constitutes a
-   valid solution */
-bool verify_post(const string& m, const string& fir, const string& sec) {
-	ssize_t m_i = 0;
-	ssize_t fir_i = 0;
-	ssize_t sec_i = 0;
-
-	for (; m_i < m.size(); ++m_i) {
-		if (isupper(m[m_i])) { // came from first
-			// if we ran out of characters or don't match, return!
-			if (fir_i == fir.size() || fir[fir_i] != tolower(m[m_i])) {
-				return false;
-			}
-			++fir_i;
-		} else {
-			if (sec_i == sec.size() || sec[sec_i] != m[m_i]) {
-				return false;
-			}
-			++sec_i;
-		}
-	}
-
-	// finally, see if we made it to the end
-	return m_i == m.size() && fir_i == fir.size() && sec_i == sec.size();
 }
 
 pair<bool, string> is_merge_of(const string& merge,
                                const string& first,
                                const string& second) {
-	// try to set up our data structure
-	auto m = create_extra_string(merge);
-	if (!mark_seconds(m, second) || !check_firsts(m, first)) goto not_a_merge;
-
-	// percolate characters towards the end
-	percolate(m, first, second);
-	//print_it(m);
-
-	// reconstruct the string
-reconstruct: { // for scoping
-		string post_merge(merge.length(), '\0');
-		size_t i = 0;
-		for (auto& e : m) {
-			post_merge[i++] = e.second ? e.c : toupper(e.c);
-		}
-
-		if (!verify_post(post_merge, first, second)) goto not_a_merge;
-		return pair<bool, string>(true, post_merge);
+	// run some preliminary checks
+	merge_t m(merge);
+	if (!m.mark_seconds(second) || !m.check_firsts(first)) {
+		goto not_a_merge;
 	}
+
+	// do what we can with the merge
+	improve(m, first, second);
+
+	// return what we got
+	if (!m.verify(first, second)) goto not_a_merge;
+	return pair<bool, string>(true, m.str());
 
 not_a_merge:
 	return pair<bool, string>(false, "");
