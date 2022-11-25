@@ -1,63 +1,75 @@
 import random
 import string
 
-MERGES = 100000
-LENGTH = 66
+MERGES = 100
+LENGTH = 5
 ERROR_RATE = .1
 
-def random_letter():
-	return random.choice(string.ascii_lowercase)
-
 def gen_string(length):
-	return ''.join(random_letter() for _ in range(length))
+	subset = string.ascii_lowercase[:random.choice(range(1, 26))]
+	return ''.join(random.choice(subset) for _ in range(length))
 
-def random_merge(a, b):
-	order = [1 for _ in range(len(a))] + [0 for _ in range(len(b))]
-	random.shuffle(order)
+def one_error(s):
+	s = list(s)
+
+	# try to swap two letters
+	i = 0
+	j = 0
+	tries = 0
+	if len(s) > 1: # this is actually maybe possible
+		while s[i] == s[j] and tries < len(s):
+			i = random.choice(range(len(s)))
+			j = random.choice(range(len(s)))
+			tries = tries + 1
+
+	if s[i] == s[j]: # just get one character wrong
+		new_letter = s[i]
+		while new_letter == s[i]:
+			new_letter = random.choice(string.ascii_lowercase)
+		s[i] = new_letter
+	else:
+		t = s[i]
+		s[i] = s[j]
+		s[j] = t
+
+	return ''.join(s)
+
+def random_merge(a, b, correct=True):
+	bias = random.random()
+
+	if not correct: # screw something up in one of the strings
+		if random.random() > .5:
+			a = one_error(a)
+		else:
+			b = one_error(b)
 
 	a_index = 0
 	b_index = 0
 	merge = ''
 
-	for which in order:
-		if which == 1:
-			merge = merge + a[a_index].upper()
-			a_index = a_index + 1
+	def add_a():
+		nonlocal merge, a_index
+		merge = merge + a[a_index].upper()
+		a_index = a_index + 1
+
+	def add_b():
+		nonlocal merge, b_index
+		merge = merge + b[b_index]
+		b_index = b_index + 1
+
+	# add randomly assigned characters from each string
+	while a_index < len(a) and b_index < len(b):
+		if random.random() > bias or b[b_index] == a[a_index]:
+			add_a()
 		else:
-			merge = merge + b[b_index]
-			b_index = b_index + 1
+			add_b()
 
-	return merge
+	# finish them off
+	while a_index < len(a):
+		add_a()
 
-def screw_up(merge):
-	merge = list(merge)
-	indices = random.sample(range(len(merge)), k=random.choice(range(1, len(merge))))
-
-	for i in indices:
-		new_letter = merge[i].lower()
-		while new_letter == merge[i].lower():
-			new_letter = random_letter()
-			if random.random() > .5:
-				new_letter = new_letter.upper()
-		merge[i] = new_letter
-
-	return ''.join(merge)
-
-# look for lowercase runs that can be pushed back and do so
-def shove_runs(merge):
-	# I *know* -- this is not efficient... but it's fast enough!
-	for _ in range(len(merge)):
-		i = 0
-		while i < len(merge):
-			j = len(merge) - i
-			while j > 0:
-				run = merge[i:(i + j)]
-				next_sect = merge[(i + j):(i + 2*j)]
-				if run.islower() and next_sect.isupper() and run == next_sect.lower():
-					# swap the two
-					merge = f'{merge[:i]}{next_sect}{run}{merge[(i + 2*j):]}'
-				j = j - 1
-			i = i + 1
+	while b_index < len(b):
+		add_b()
 
 	return merge
 
@@ -71,16 +83,16 @@ if __name__ == "__main__":
 
 			a = gen_string(random.choice(range(LENGTH)))
 			b = gen_string(random.choice(range(max(0, 2 - len(a)), LENGTH)))
-			merge = random_merge(a, b)
-			expected_out = shove_runs(merge)
 
-			is_error = random.random() < ERROR_RATE
-			if is_error:
-				merge = screw_up(merge)
-				expected_out = '*** NOT A MERGE ***'
-
+			correct = random.random() > ERROR_RATE or min(len(a), len(b)) == 0
+			merge = random_merge(a, b, correct)
 			infile.write(f'{a}\n{b}\n{merge.lower()}\n')
-			outfile.write(f'{expected_out}\n')
+
+			if correct:
+				outfile.write(f'{merge}\n')
+			else:
+				outfile.write('*** NOT A MERGE ***\n')
+
 		print(' generated.')
 
 # Copyright (C) 2022  Catherine Van West
