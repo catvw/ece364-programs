@@ -106,17 +106,17 @@ public:
 		ssize_t sec_i = 0;
 
 		for (; m_i < merge.size(); ++m_i) {
-			if (!second[m_i]) { // came from first
+			if (second[m_i]) {
 				// if we ran out of characters or don't match, return!
-				if (fir_i == fir.size() || fir[fir_i] != merge[m_i]) {
-					return false;
-				}
-				++fir_i;
-			} else {
 				if (sec_i == sec.size() || sec[sec_i] != merge[m_i]) {
 					return false;
 				}
 				++sec_i;
+			} else {
+				if (fir_i == fir.size() || fir[fir_i] != merge[m_i]) {
+					return false;
+				}
+				++fir_i;
 			}
 		}
 
@@ -157,18 +157,18 @@ template<typename view_t, typename str_t>
 bool percolate(view_t& m, const str_t s) {
 	const size_t size = m.size();
 
-	ssize_t si = 0;
-	for (ssize_t i = 0; i < size; ++i) {
+	size_t si = 0;
+	for (size_t i = 0; i < size; ++i) {
 		if (m[i].move_forward) {
 			// first string, so see if it's in the right place
-			bool right = s[si] == m[i].c;
+			bool right = s[si++] == m[i].c;
 			if (!right) {
 				// this character came too soon, so push it into the next
 				// block of seconds
 				const char looking_for = m[i].c;
 
 				// scroll forward to a character that might work
-				ssize_t j = i + 1;
+				size_t j = i + 1;
 				for (; j < size; ++j) {
 					if (m[j].move_backward && m[j].c == looking_for) break;
 				}
@@ -179,8 +179,6 @@ bool percolate(view_t& m, const str_t s) {
 					return true;
 				}
 			}
-
-			++si;
 		}
 	}
 
