@@ -302,16 +302,15 @@ void manual_case(const string& ex,
 }
 
 int main() {
-//	manual_case("FkIWRwZrhdEcMz", "fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
-//	manual_case("JmvMYnVNVvrGet", "jmvmynvnvvrget", "jmyvnvg", "mvnvret");
-	// should be gjoWXPBUwSbwlJ
-//	manual_case("gjoWXPBUwSbwlJ", "gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
-//	manual_case("DGPdpKjBzs", "dgpdpkjbzs", "dgpkb", "dpjzs");
-//	manual_case("vDKZLFkAzzGzkPzCfiCz", "vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
-//	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
-//	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
-//	manual_case("EaBBEEbEDeed", "eabbeebedeed", "ebbeeed", "abeed");
-//	return 0;
+	manual_case("FkIWRwZrhdEcMz", "fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
+	manual_case("JmvMYnVNVvrGet", "jmvmynvnvvrget", "jmyvnvg", "mvnvret");
+	manual_case("gjoWXPBUwSbwlJ", "gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
+	manual_case("DGPdpKjBzs", "dgpdpkjbzs", "dgpkb", "dpjzs");
+	manual_case("vDKZLFkAzzGzkPzCfiCz", "vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
+	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
+	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
+	manual_case("EaBBEEbEDeed", "eabbeebedeed", "ebbeeed", "abeed");
+	return 0;
 
 	string input;
 	read: { // for scoping
