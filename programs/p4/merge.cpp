@@ -129,7 +129,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	while (percolating) {
 		percolating = false;
 
-		print_it(m_orig);
+		//print_it(m_orig);
 
 		// set up for crazy string battle
 		ssize_t fir_i = 0;
@@ -165,7 +165,7 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		}
 
 forward_end: ;
-		print_it(m_orig);
+		//print_it(m_orig);
 
 		// now try to do the same thing in favor of the second string
 		for (ssize_t i = size - 1; i > -1; --i) {
@@ -197,7 +197,7 @@ forward_end: ;
 		}
 
 backward_end: ;
-		print_it(m_orig);
+		//print_it(m_orig);
 	}
 
 	// look for blocks of characters that can be optimized
@@ -303,7 +303,7 @@ void manual_case(const string& ex,
 
 int main() {
 //	manual_case("FkIWRwZrhdEcMz", "fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
-	manual_case("JmvMYnVNVvrGet", "jmvmynvnvvrget", "jmyvnvg", "mvnvret");
+//	manual_case("JmvMYnVNVvrGet", "jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be gjoWXPBUwSbwlJ
 //	manual_case("gjoWXPBUwSbwlJ", "gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
 //	manual_case("DGPdpKjBzs", "dgpdpkjbzs", "dgpkb", "dpjzs");
