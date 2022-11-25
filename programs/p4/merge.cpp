@@ -38,14 +38,6 @@ vector<character> create_extra_string(const string& str) {
 	return estr;
 }
 
-vector<character*> create_percolate_reference(vector<character>& m) {
-	vector<character*> m_ref(m.size());
-	for (size_t i = 0; i < m.size(); ++i) {
-		m_ref[i] = &m[i];
-	}
-	return m_ref;
-}
-
 /* mark the latest possible positions that second-string characters could
    occur */
 bool mark_seconds(vector<character>& m, const string& sec) {
@@ -88,9 +80,8 @@ void print_it(vector<character>& m) {
 }
 
 /* percolate characters in the wrong directions */
-void percolate(vector<character>& m_orig, const string& fir, const string& sec) {
-	const size_t size = m_orig.size();
-	vector<character*> m = create_percolate_reference(m_orig);
+void percolate(vector<character>& m, const string& fir, const string& sec) {
+	const size_t size = m.size();
 
 	bool percolating = true;
 	while (percolating) {
@@ -104,24 +95,24 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 
 		// try to make a single long-distance swap in favor of the first string
 		for (ssize_t i = 0; i < size; ++i) {
-			if (!m[i]->second) {
+			if (!m[i].second) {
 				// first string, so see if it's in the right place
-				bool right = fir[fir_i] == m[i]->c;
+				bool right = fir[fir_i] == m[i].c;
 				if (!right) {
 					// this character came too soon, so push it into the next
 					// block of seconds
-					const char looking_for = m[i]->c;
+					const char looking_for = m[i].c;
 
 					// scroll forward to a character that might work
 					ssize_t j = i + 1;
 					for (; j < size; ++j) {
-						if (m[j]->second && m[j]->c == looking_for) break;
+						if (m[j].second && m[j].c == looking_for) break;
 					}
 
 					if (j < size) {
 						// found one, so do a swap
-						m[i]->second = true;
-						m[j]->second = false;
+						m[i].second = true;
+						m[j].second = false;
 						percolating = true;
 						goto forward_end;
 					}
@@ -136,24 +127,24 @@ forward_end: ;
 
 		// now try to do the same thing in favor of the second string
 		for (ssize_t i = size - 1; i > -1; --i) {
-			if (m[i]->second) {
+			if (m[i].second) {
 				// second string, so see if it's in the right place
-				bool right = sec[sec_i] == m[i]->c;
+				bool right = sec[sec_i] == m[i].c;
 				if (!right) {
 					// this character came too late, so push it into the next
 					// block of firsts
-					const char looking_for = m[i]->c;
+					const char looking_for = m[i].c;
 
 					// scroll backward to a character that might work
 					ssize_t j = i - 1;
 					for (; j > -1; --j) {
-						if (!m[j]->second && m[j]->c == looking_for) break;
+						if (!m[j].second && m[j].c == looking_for) break;
 					}
 
 					if (j > -1) {
 						// found one, so do a swap
-						m[i]->second = false;
-						m[j]->second = true;
+						m[i].second = false;
+						m[j].second = true;
 						percolating = true;
 						goto backward_end;
 					}
