@@ -1,8 +1,8 @@
 import random
 import string
 
-MERGES = 100
-LENGTH = 5
+MERGES = 10000
+LENGTH = 13
 ERROR_RATE = .1
 
 def gen_string(length):
@@ -17,7 +17,7 @@ def one_error(s):
 	j = 0
 	tries = 0
 	if len(s) > 1: # this is actually maybe possible
-		while s[i] == s[j] and tries < len(s):
+		while s[i] == s[j] and abs(i - j) > 1 and tries < len(s):
 			i = random.choice(range(len(s)))
 			j = random.choice(range(len(s)))
 			tries = tries + 1
