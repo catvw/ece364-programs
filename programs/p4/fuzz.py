@@ -1,8 +1,8 @@
 import random
 import string
 
-MERGES = 100000
-LENGTH = 1000
+MERGES = 10000
+LENGTH = 60
 ERROR_RATE = .1
 
 def gen_string(length):

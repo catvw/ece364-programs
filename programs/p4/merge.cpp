@@ -11,9 +11,7 @@ using namespace std;
 
 struct character {
 	char c;
-	ssize_t orig_pos;
 	bool second;
-	bool right_rel;
 };
 
 string prompt(const char* pr) {
@@ -35,9 +33,7 @@ vector<character> create_extra_string(const string& str) {
 	vector<character> estr(str.size());
 	for (size_t i = 0; i < str.size(); ++i) {
 		estr[i].c = str[i];
-		estr[i].orig_pos = i;
 		estr[i].second = false;
-		estr[i].right_rel = false;
 	}
 	return estr;
 }
@@ -82,24 +78,6 @@ bool check_firsts(vector<character>& m, const string& fir) {
 	return true; // either they match or some SERIOUS rollover occurred
 }
 
-/* mark which elements of each string are in the right place relative to
-   their end */
-void mark_relatively_correct(vector<character>& m,
-                             const string& fir,
-                             const string& sec) {
-	ssize_t fir_i = fir.length() - 1;
-	ssize_t sec_i = sec.length() - 1;
-	for (size_t i = m.size() - 1; i >= 0 && fir_i >= 0 && sec_i >= 0; --i) {
-		if (!m[i].second) {
-			m[i].right_rel = m[i].c == fir[fir_i];
-			--fir_i;
-		} else {
-			m[i].right_rel = m[i].c == sec[sec_i];
-			--sec_i;
-		}
-	}
-}
-
 void print_it(vector<character>& m) {
 	// print out what we got
 	cout << "o: ";
@@ -109,21 +87,10 @@ void print_it(vector<character>& m) {
 	cout << '\n';
 }
 
-void print_it(vector<character*>& m) {
-	// print out what we got
-	cout << "r: ";
-	for (size_t i = 0; i < m.size(); ++i) {
-		cout << (char) (m[i]->second ? m[i]->c : toupper(m[i]->c));
-	}
-	cout << '\n';
-}
-
 /* percolate characters in the wrong directions */
 void percolate(vector<character>& m_orig, const string& fir, const string& sec) {
 	const size_t size = m_orig.size();
 	vector<character*> m = create_percolate_reference(m_orig);
-
-	ssize_t last_forward_swap[2] = {-1, -1};
 
 	bool percolating = true;
 	while (percolating) {
@@ -279,8 +246,9 @@ pair<bool, string> is_merge_of(const string& merge,
 	// reconstruct the string
 reconstruct: { // for scoping
 		string post_merge(merge.length(), '\0');
+		size_t i = 0;
 		for (auto& e : m) {
-			post_merge[e.orig_pos] = e.second ? e.c : toupper(e.c);
+			post_merge[i++] = e.second ? e.c : toupper(e.c);
 		}
 
 		if (!verify_post(post_merge, first, second)) goto not_a_merge;
