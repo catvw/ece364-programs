@@ -209,22 +209,8 @@ void improve(merge_t& m, const string& fir, const string& sec) {
 	auto m_rev = m.reverse();
 	auto sec_rev = sec.rbegin();
 
-	bool percolating = true;
-	while (percolating) {
-		percolating = false;
-
-		cout << m << '\n';
-
-		// try to make a single long-distance swap in favor of the first string
-		percolating = percolating || percolate(m_for, fir_for);
-
-		cout << m << '\n';
-
-		// now try to do the same thing in favor of the second string
-		percolating = percolating || percolate(m_rev, sec_rev);
-
-		cout << m << '\n';
-	}
+	// note: do *not* use a shortcut OR here!
+	while (percolate(m_for, fir_for) | percolate(m_rev, sec_rev));
 }
 
 pair<bool, string> is_merge_of(const string& merge,
