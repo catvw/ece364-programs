@@ -50,18 +50,18 @@ vector<character*> create_percolate_reference(vector<character>& m) {
 	return m_ref;
 }
 
-/* mark the earliest possible positions that second-string characters could
+/* mark the latest possible positions that second-string characters could
    occur */
 bool mark_seconds(vector<character>& m, const string& sec) {
-	ssize_t sec_i = 0;
-	for (size_t i = 0; i < m.size() && sec_i < sec.size(); ++i) {
+	ssize_t sec_i = sec.size() - 1;
+	for (ssize_t i = m.size() - 1; i > -1 && sec_i > -1; --i) {
 		if (m[i].c == sec[sec_i]) { // found a match, put it here
 			m[i].second = true;
-			++sec_i;
+			--sec_i;
 		}
 	}
 
-	return sec_i == sec.size(); // placed all the characters!
+	return sec_i == -1; // placed all the characters!
 }
 
 /* check if the characters not marked as seconds permit a merge */
@@ -118,7 +118,7 @@ void print_it(vector<character*>& m) {
 	cout << '\n';
 }
 
-/* percolate second characters towards the end of the string */
+/* percolate characters in the wrong directions */
 void percolate(vector<character>& m_orig, const string& fir, const string& sec) {
 	const size_t size = m_orig.size();
 	vector<character*> m = create_percolate_reference(m_orig);
@@ -129,49 +129,34 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 	while (percolating) {
 		percolating = false;
 
-//		print_it(m_orig);
+		print_it(m_orig);
 
 		// set up for crazy string battle
-		ssize_t last_second = -1;
 		ssize_t fir_i = 0;
-
-		ssize_t last_first = size;
 		ssize_t sec_i = sec.size() - 1;
 
 		// try to make a single long-distance swap in favor of the first string
-		for (size_t i = 0; i < size; ++i) {
-			if (m[i]->second) {
-				last_second = i;
-			} else {
+		for (ssize_t i = 0; i < size; ++i) {
+			if (!m[i]->second) {
 				// first string, so see if it's in the right place
 				bool right = fir[fir_i] == m[i]->c;
 				if (!right) {
-					// the only swappable place the missing character could be
-					// is in a previous block of seconds, so find one
-					const char looking_for = fir[fir_i];
+					// this character came too soon, so push it into the next
+					// block of seconds
+					const char looking_for = m[i]->c;
 
-					// scroll back to a character that might work
-					for (; last_second > -1; --last_second) {
-						if (m[last_second]->second
-								&& m[last_second]->c == looking_for) {
-							break;
-						}
+					// scroll forward to a character that might work
+					ssize_t j = i + 1;
+					for (; j < size; ++j) {
+						if (m[j]->second && m[j]->c == looking_for) break;
 					}
 
-					if (last_second > -1) {
-						// found it, look for a forward match
-						for (size_t j = i + 1; j < size; ++j) {
-							if (!m[j]->second && m[j]->c == looking_for) {
-								// found it!
-								percolating = true;
-								m[last_second]->second = false;
-								m[j]->second = true;
-
-//								last_forward_swap[0] = last_second;
-//								last_forward_swap[1] = j;
-								goto forward_end;
-							}
-						}
+					if (j < size) {
+						// found one, so do a swap
+						m[i]->second = true;
+						m[j]->second = false;
+						percolating = true;
+						goto forward_end;
 					}
 				}
 
@@ -180,42 +165,30 @@ void percolate(vector<character>& m_orig, const string& fir, const string& sec) 
 		}
 
 forward_end: ;
-//		print_it(m_orig);
+		print_it(m_orig);
 
 		// now try to do the same thing in favor of the second string
 		for (ssize_t i = size - 1; i > -1; --i) {
-			if (!m[i]->second) {
-				last_first = i;
-			} else {
+			if (m[i]->second) {
 				// second string, so see if it's in the right place
 				bool right = sec[sec_i] == m[i]->c;
 				if (!right) {
-					// the only swappable place the missing character could be
-					// is in a previous block of firsts, so find one
-					const char looking_for = sec[sec_i];
+					// this character came too late, so push it into the next
+					// block of firsts
+					const char looking_for = m[i]->c;
 
-					// scroll forward to a character that might work
-					for (; last_first < size; ++last_first) {
-						if (!m[last_first]->second
-								&& m[last_first]->c == looking_for) {
-							break;
-						}
+					// scroll backward to a character that might work
+					ssize_t j = i - 1;
+					for (; j > -1; --j) {
+						if (!m[j]->second && m[j]->c == looking_for) break;
 					}
 
-					if (last_first < size) {
-						// found it, look for a backward match
-						for (ssize_t j = i - 1; j > -1; --j) {
-							if (m[j]->second && m[j]->c == looking_for) {
-								// found it!
-								percolating = true;
-								m[last_first]->second = true;
-								m[j]->second = false;
-
-//								last_forward_swap[0] = last_second;
-//								last_forward_swap[1] = j;
-								goto backward_end;
-							}
-						}
+					if (j > -1) {
+						// found one, so do a swap
+						m[i]->second = false;
+						m[j]->second = true;
+						percolating = true;
+						goto backward_end;
 					}
 				}
 
@@ -224,7 +197,7 @@ forward_end: ;
 		}
 
 backward_end: ;
-//		print_it(m_orig);
+		print_it(m_orig);
 	}
 
 	// look for blocks of characters that can be optimized
@@ -329,21 +302,16 @@ void manual_case(const string& ex,
 }
 
 int main() {
-	// should be FkIWRwZrhdEcMz
-//	manual_case("fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
-	// should be JmvMYnVNVvrGet
-//	manual_case("jmvmynvnvvrget", "jmyvnvg", "mvnvret");
+//	manual_case("FkIWRwZrhdEcMz", "fkiwrwzrhdecmz", "fiwrzem", "kwrhdcz");
+	manual_case("JmvMYnVNVvrGet", "jmvmynvnvvrget", "jmyvnvg", "mvnvret");
 	// should be gjoWXPBUwSbwlJ
-//	manual_case("gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
-	// should be DGPdpKjBzs
-//	manual_case("dgpdpkjbzs", "dgpkb", "dpjzs");
-	//           vDKZLFkAzzGZkPzCfiCz
-	// should be vDKZLFkAzzGzkPzCfiCz
-//	manual_case("vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
+//	manual_case("gjoWXPBUwSbwlJ", "gjowxpbuwsbwlj", "wxpbusj", "gjowbwl");
+//	manual_case("DGPdpKjBzs", "dgpdpkjbzs", "dgpkb", "dpjzs");
+//	manual_case("vDKZLFkAzzGzkPzCfiCz", "vdkzlfkazzgzkpzcficz", "dkzlfagpcc", "vkzzzkzfiz");
 //	manual_case("rVokqXdVMVOvTotHkmXEnppGAZ", "rvokqxdvmvovtothkmxenppgaz", "vxvmvothxegaz", "rokqdvotkmnpp");
 //	manual_case("JCipDlWWwz", "jcipdlwwwz", "jcdww", "iplwz");
-	manual_case("EaBBEEbEDeed", "eabbeebedeed", "ebbeeed", "abeed");
-	return 0;
+//	manual_case("EaBBEEbEDeed", "eabbeebedeed", "ebbeeed", "abeed");
+//	return 0;
 
 	string input;
 	read: { // for scoping
