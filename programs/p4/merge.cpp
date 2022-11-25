@@ -166,44 +166,6 @@ forward_end: ;
 backward_end: ;
 		//print_it(m_orig);
 	}
-
-	// look for blocks of characters that can be optimized
-	percolating = true;
-	while (percolating) {
-		percolating = false;
-
-		for (ssize_t i = 0; i < size; ++i) {
-			if (m[i]->second) {
-				// might be able to improve something here!
-				string comparison(m_orig.size(), '\0');
-				ssize_t first = 0;
-				ssize_t second = 0;
-				ssize_t match_length = 0;
-
-				for (ssize_t j = i; j < size; ++j) {
-					if (m[j]->second) {
-						comparison[second++] = m[j]->c;
-					} else if (m[j]->c == comparison[first]) {
-						++first;
-					} else break; // mismatching character!
-
-					// see if we have a match
-					if (first == second) match_length = 2*second;
-				}
-
-				if (match_length > 0) {
-					for (ssize_t j = i; j < i + match_length; ++j) {
-						// swap between first and second
-						m[j]->second = !m[j]->second;
-					}
-
-					// advance ahead, we know this is done
-					i = i + match_length;
-					percolating = true;
-				}
-			}
-		}
-	}
 }
 
 /* check if whatever we ended up with after percolating actually constitutes a
