@@ -81,24 +81,6 @@ public:
 		return sec_i == -1; // placed all the characters!
 	}
 
-	/* check if the characters not marked as seconds permit a merge */
-	bool check_firsts(const string& fir) {
-		ssize_t counts[26];
-		ssize_t i;
-
-		for (i = 0; i < 26; ++i) counts[i] = 0;
-		for (i = 0; i < merge.size(); ++i) {
-			if (!second[i]) ++counts[merge[i] - 'a'];
-		}
-		for (i = 0; i < fir.size(); ++i) {
-			--counts[fir[i] - 'a'];
-		}
-		for (i = 0; i < 26; ++i) {
-			if (counts[i] != 0) return false;
-		}
-		return true; // either they match or some SERIOUS rollover occurred
-	}
-
 	/* check if whatever we have is a valid solution */
 	bool verify(const string& fir, const string& sec) {
 		ssize_t m_i = 0;
@@ -200,11 +182,9 @@ void improve(merge_t& m, const string& fir, const string& sec) {
 pair<bool, string> is_merge_of(const string& merge,
                                const string& first,
                                const string& second) {
-	// run some preliminary checks
+	// initialize the merge structure
 	merge_t m(merge);
-	if (!m.mark_seconds(second) || !m.check_firsts(first)) {
-		goto not_a_merge;
-	}
+	if (!m.mark_seconds(second)) goto not_a_merge;
 
 	// do what we can with the merge
 	improve(m, first, second);
