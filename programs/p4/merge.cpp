@@ -1,131 +1,200 @@
+#include "merge.h"
 #include <cctype>
 #include <cstddef>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include <ostream>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
-string prompt(const char* pr) {
-	string dict_file;
-	cout << pr;
-	getline(cin, dict_file);
-	return dict_file;
-}
+class merge_t {
+private:
+	string merge;
+	vector<bool> second;
 
-string read_file(istream& file, string& out) {
-	// get until EOF, so long as we don't see any null characters
-	getline(file, out, '\0');
-	return out;
-}
+public:
+	/* represents a view of the merge, specialized for the crazy stuff I do in
+	   this program */
+	template<typename str_it, typename bool_it, bool forward_it>
+	class view_t {
+	public:
+		/* represents an element of the string */
+		struct element_t {
+			const char c;
+			const bool move_forward;
+			const bool move_backward;
 
-pair<bool, string> is_merge_of(const string& merge,
-                               const string& string1,
-                               const string& string2) {
-	auto m = merge.begin();
-	auto s1 = string1.begin();
-	auto s2 = string2.begin();
-	size_t block_length = 0;
+			element_t(char c, bool forward)
+				: c(c), move_forward(forward), move_backward(!forward) { }
+			operator char() { return c; }
+		};
 
-	string ret(merge.length(), '\0');
-	auto r = ret.begin();
+		view_t(merge_t& m, str_it si, bool_it bi)
+		: m(m), si(si), bi(bi) { }
 
-	bool reverse = false;
-	while (true) {
-		//cout << *s1 << ' ' << *s2 << ' ' << ret << "\n";
-		const bool end_of_m = (m == merge.end());
-		const bool end_of_s1 = (s1 == string1.end());
-		const bool end_of_s2 = (s2 == string2.end());
-
-		if (end_of_m && end_of_s1 && end_of_s2) {
-			// made it to the end!
-			return pair<bool, string>(true, ret);
+		element_t operator[](size_t i) {
+			// if forward-iterating, first-string characters move forward
+			if (forward_it) return element_t(si[i], !bi[i]);
+			else return element_t(si[i], bi[i]);
 		}
 
-		auto s2_ahead = s2 + block_length;
+		size_t size() { return m.size(); }
 
-		// if we can consume a character from s1, do so
-		if (!reverse && !end_of_s1 && *s1 == *m) {
-			if (s2_ahead < string2.end() && *s1 == *s2_ahead) {
-				// inside an identical block, so increment
-				++block_length;
-			} else block_length = 0;
+		bool swap(size_t i, size_t j) {
+			if (si[i] != si[j]) return false;
 
-			*r = toupper(*m);
-			++m;
-			++r;
-			++s1;
-		} else if (!end_of_s2 && *s2 == *m) { // try the other string
-			*r = tolower(*m);
-			++m;
-			++r;
-			++s2;
-			block_length = 0; // definitely not identical!
-			reverse = false;
-		} else {
-			// go back to the start of the last block
-			m -= block_length;
-			r -= block_length;
-			s1 -= block_length;
+			// can't use ::swap() here, as it doesn't like bitrefs
+			bool t = bi[i];
+			bi[i] = bi[j];
+			bi[j] = t;
 
-			// see if we can use the other block
-			if (s2_ahead < string2.end()
-					&& *s2_ahead == *(m + block_length)) {
-				for (; block_length > 0; --block_length) {
-					*r = tolower(*m);
-					++m;
-					++r;
-					++s2;
+			return true;
+		}
+
+	private:
+		merge_t& m;
+		str_it si;
+		bool_it bi;
+	};
+
+	using forward_view = view_t<decltype(merge.begin()),
+	                            decltype(second.begin()),
+	                            true>;
+	using reverse_view = view_t<decltype(merge.rbegin()),
+	                            decltype(second.rbegin()),
+	                            false>;
+
+	merge_t(const string& m) : merge(m), second(m.size()) { }
+
+	/* mark the latest possible positions that second-string characters could
+	   occur */
+	bool mark_seconds(const string& sec) {
+		ssize_t sec_i = sec.size() - 1;
+		for (ssize_t i = merge.size() - 1; i > -1 && sec_i > -1; --i) {
+			if (merge[i] == sec[sec_i]) { // found a match, put it here
+				second[i] = true;
+				--sec_i;
+			}
+		}
+
+		return sec_i == -1; // placed all the characters!
+	}
+
+	/* check if whatever we have is a valid solution */
+	bool verify(const string& fir, const string& sec) {
+		ssize_t m_i = 0;
+		ssize_t fir_i = 0;
+		ssize_t sec_i = 0;
+
+		for (; m_i < merge.size(); ++m_i) {
+			if (second[m_i]) {
+				// if we ran out of characters or don't match, return!
+				if (sec_i == sec.size() || sec[sec_i] != merge[m_i]) {
+					return false;
 				}
-			} else { // go back to the last fork before this one
-				if (s1 == string1.begin()) { // can't back up further!
-					return pair<bool, string>(false, "");
+				++sec_i;
+			} else {
+				if (fir_i == fir.size() || fir[fir_i] != merge[m_i]) {
+					return false;
+				}
+				++fir_i;
+			}
+		}
+
+		// finally, see if we made it to the end
+		return m_i == merge.size()
+			&& fir_i == fir.size()
+			&& sec_i == sec.size();
+	}
+
+	forward_view forward() {
+		return forward_view(*this, merge.begin(), second.begin());
+	}
+
+	reverse_view reverse() {
+		return reverse_view(*this, merge.rbegin(), second.rbegin());
+	}
+
+	size_t size() {
+		return merge.size();
+	}
+
+	string str() const {
+		string ret(merge);
+		for (size_t i = 0; i < merge.size(); ++i) {
+			// capitalize when necessary
+			if (!second[i]) ret[i] = toupper(ret[i]);
+		}
+		return ret;
+	}
+};
+
+ostream& operator<<(ostream& out, const merge_t& m) {
+	return out << m.str();
+}
+
+/* percolate incorrect characters in the wrong directions */
+template<typename view_t, typename str_t>
+bool percolate(view_t& m, const str_t s) {
+	const size_t size = m.size();
+
+	size_t si = 0;
+	for (size_t i = 0; i < size; ++i) {
+		if (m[i].move_forward) {
+			// first string, so see if it's in the right place
+			bool right = s[si++] == m[i].c;
+			if (!right) {
+				// this character came too soon, so push it into the next
+				// block of seconds
+				const char looking_for = m[i].c;
+
+				// scroll forward to a character that might work
+				size_t j = i + 1;
+				for (; j < size; ++j) {
+					if (m[j].move_backward && m[j].c == looking_for) break;
 				}
 
-				while (*(m - 1) == *(r - 1)) { // while lowercase
-					--m;
-					--r;
-					--s2;
+				if (j < size) {
+					// found one, so do a swap
+					m.swap(i, j);
+					return true;
 				}
-
-				--m;
-				--r;
-				--s1; // one more step back
-				reverse = true;
 			}
 		}
 	}
+
+	return false;
 }
 
-int main() {
-	string input;
-	read: { // for scoping
-		ifstream in_file(prompt("Enter name of input file: "));
-		read_file(in_file, input);
-	}
+/* improve the strings until they stabilize */
+void improve(merge_t& m, const string& fir, const string& sec) {
+	auto m_for = m.forward();
+	auto fir_for = fir.begin();
 
-	istringstream in_stream(input);
-	ostringstream output;
-	string string1;
-	string string2;
-	string merge;
-	while (!getline(in_stream, string1).eof()) {
-		getline(in_stream, string2);
-		getline(in_stream, merge);
+	auto m_rev = m.reverse();
+	auto sec_rev = sec.rbegin();
 
-		auto result = is_merge_of(merge, string1, string2);
-		if (result.first) output << result.second << '\n';
-		else output << "*** NOT A MERGE ***\n";
-	}
+	// note: do *not* use a shortcut OR here!
+	while (percolate(m_for, fir_for) | percolate(m_rev, sec_rev));
+}
 
-	write: {
-		ofstream out_file(prompt("Enter name of output file: "));
-		out_file << output.str();
-	}
+pair<bool, string> is_merge_of(const string& merge,
+                               const string& first,
+                               const string& second) {
+	// initialize the merge structure
+	merge_t m(merge);
+	if (!m.mark_seconds(second)) goto not_a_merge;
 
-	return 0;
+	// do what we can with the merge
+	improve(m, first, second);
+
+	// return what we got
+	if (!m.verify(first, second)) goto not_a_merge;
+	return pair<bool, string>(true, m.str());
+
+not_a_merge:
+	return pair<bool, string>(false, "");
 }
 
 /*

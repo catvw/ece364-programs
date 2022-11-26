@@ -1,80 +1,111 @@
 import random
 import string
 
-MERGES = 1000
-LENGTH = 5
+MERGES = 1200000
+LENGTH = 120
 ERROR_RATE = .1
 
-order = [1 for _ in range(LENGTH)] + [0 for _ in range(LENGTH)]
-
-def random_letter():
-	return random.choice(string.ascii_lowercase)
-
 def gen_string(length):
-	return ''.join(random_letter() for _ in range(length))
+	subset = string.ascii_lowercase[:random.choice(range(1, 26))]
+	return ''.join(random.choice(subset) for _ in range(length))
 
-def random_merge(a, b):
-	global order
+def one_error(s):
+	s = list(s)
+
+	# try to swap two letters
+	i = 0
+	j = 0
+	tries = 0
+	if len(s) > 1: # this is actually maybe possible
+		while s[i] == s[j] and abs(i - j) > 1 and tries < len(s):
+			i = random.choice(range(len(s)))
+			j = random.choice(range(len(s)))
+			tries = tries + 1
+
+	if s[i] == s[j]: # just get one character wrong
+		new_letter = s[i]
+		while new_letter == s[i]:
+			new_letter = random.choice(string.ascii_lowercase)
+		s[i] = new_letter
+	else:
+		t = s[i]
+		s[i] = s[j]
+		s[j] = t
+
+	return ''.join(s)
+
+def random_merge(a, b, correct=True):
+	bias = random.random()
+
+	if not correct: # screw something up in one of the strings
+		if random.random() > .5:
+			a = one_error(a)
+		else:
+			b = one_error(b)
 
 	a_index = 0
 	b_index = 0
 	merge = ''
 
-	random.shuffle(order)
-	for which in order:
-		if which == 1:
-			merge = merge + a[a_index].upper()
-			a_index = a_index + 1
+	def add_a():
+		nonlocal merge, a_index
+		merge = merge + a[a_index].upper()
+		a_index = a_index + 1
+
+	def add_b():
+		nonlocal merge, b_index
+		merge = merge + b[b_index]
+		b_index = b_index + 1
+
+	# add randomly assigned characters from each string
+	while a_index < len(a) and b_index < len(b):
+		if random.random() > bias or b[b_index] == a[a_index]:
+			add_a()
 		else:
-			merge = merge + b[b_index]
-			b_index = b_index + 1
+			add_b()
 
-	return merge
+	# finish them off
+	while a_index < len(a):
+		add_a()
 
-def screw_up(merge):
-	merge = list(merge)
-
-	i = random.choice(range(LENGTH))
-	new_letter = merge[i].lower()
-	while new_letter == merge[i].lower():
-		new_letter = random_letter()
-		if random.random() > .5:
-			new_letter = new_letter.upper()
-	merge[i] = new_letter
-
-	return ''.join(merge)
-
-# look for lowercase runs that can be pushed back and do so
-def shove_runs(merge):
-	# I *know* -- this is not efficient... but it's fast enough!
-	for _ in range(len(merge)):
-		i = 0
-		while i < len(merge):
-			j = len(merge) - i
-			while j > 0:
-				run = merge[i:(i + j)]
-				next_sect = merge[(i + j):(i + 2*j)]
-				if run.islower() and next_sect.isupper() and run == next_sect.lower():
-					# swap the two
-					merge = f'{merge[:i]}{next_sect}{run}{merge[(i + 2*j):]}'
-				j = j - 1
-			i = i + 1
+	while b_index < len(b):
+		add_b()
 
 	return merge
 
 if __name__ == "__main__":
 	random.seed()
 	with open('ref/fuzz_in', 'w') as infile, open('ref/fuzz_out', 'w') as outfile:
-		for _ in range(MERGES):
-			a = gen_string(LENGTH)
-			b = gen_string(LENGTH)
-			merge = random_merge(a, b)
-			expected_out = shove_runs(merge)
+		print('generating:   0%', end='', flush=True)
+		for i in range(MERGES):
+			if i % int(max(MERGES/100, 1)) == 0:
+				print(f'\x1b[4D{int(100*(i + 1)/MERGES):3}%', end='', flush=True)
 
-			is_error = random.random() < ERROR_RATE
-			if is_error:
-				merge = screw_up(merge)
-				expected_out = '*** NOT A MERGE ***'
+			a = gen_string(random.choice(range(LENGTH)))
+			b = gen_string(random.choice(range(max(0, 2 - len(a)), LENGTH)))
 
+			correct = random.random() > ERROR_RATE or min(len(a), len(b)) == 0
+			merge = random_merge(a, b, correct)
 			infile.write(f'{a}\n{b}\n{merge.lower()}\n')
-			outfile.write(f'{expected_out}\n')
+
+			if correct:
+				outfile.write(f'{merge}\n')
+			else:
+				outfile.write('*** NOT A MERGE ***\n')
+
+		print(' generated.')
+
+# Copyright (C) 2022  Catherine Van West
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
