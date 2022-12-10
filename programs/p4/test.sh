@@ -1,20 +1,21 @@
 #!/bin/bash
-
-# archive program 1
-make -C p1/ clean
-tar acvf p1.tar.gz p1/Makefile p1/test.sh p1/main.cpp p1/hash/ p1/spell/ p1/ref/
-
-# archive program 2
-make -C p2/ clean
-tar acvf p2.tar.gz p1/hash/ p2/Makefile p2/heap/ p2/targ/
-
-# archive program 3
-make -C p3/ clean
-tar acvf p3.tar.gz p1/hash/ p2/heap/ p3/Makefile p3/test.sh p3/ref p3/dijkstra p3/target
-
-# archive program 4
-make -C p4/ clean
-tar acvf p4.tar.gz p4/*.cpp p4/*.h p4/ref/ p4/test.sh p4/Makefile p4/fuzz.py
+mkdir -p tmp/
+echo -e 'ref/in\ntmp/out' | ./$1
+echo -e 'ref/bonus_in\ntmp/bonus_out' | ./$1
+echo
+echo '-- out --'
+diff ref/out tmp/out
+echo
+echo '-- bonus --'
+diff ref/bonus_out tmp/bonus_out
+if [ $# -eq 2 ]; then
+	echo
+	echo -e 'ref/fuzz_in\ntmp/fuzz_out' | ./$1
+	echo
+	echo '-- fuzz --'
+	diff ref/fuzz_out tmp/fuzz_out
+fi
+echo
 
 #Copyright (C) 2022  Catherine Van West
 #
