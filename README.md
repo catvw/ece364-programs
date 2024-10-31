@@ -1,6 +1,6 @@
 # ECE365 Programs
 
-Probably won't be released, but who knows?
+Copyright applies to my code alone.
 
 Copyright (C) 2022 Catherine Van West \
 Licensed under [GPLv3][GPLv3] or later.
